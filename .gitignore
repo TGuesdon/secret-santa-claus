@@ -1,4 +1,6 @@
 # Logs
+.private/
+.superpowers/
 logs
 *.log
 npm-debug.log*

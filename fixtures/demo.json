@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Alice",
+    "email": "alice@example.com",
+    "id": "AQEBAQEBAQEBAQEBAQEBAQ",
+    "key": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE",
+    "recipientName": "Bob"
+  },
+  {
+    "name": "Bob",
+    "email": "bob@example.com",
+    "id": "AgICAgICAgICAgICAgICAg",
+    "key": "AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI",
+    "recipientName": "Charlie"
+  },
+  {
+    "name": "Charlie",
+    "email": "charlie@example.com",
+    "id": "AwMDAwMDAwMDAwMDAwMDAw",
+    "key": "AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM",
+    "recipientName": "Diane"
+  },
+  {
+    "name": "Diane",
+    "email": "diane@example.com",
+    "id": "BAQEBAQEBAQEBAQEBAQEBA",
+    "key": "BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ",
+    "recipientName": "Alice"
+  }
+]
