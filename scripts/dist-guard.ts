@@ -51,7 +51,9 @@ export async function inspectDist(
 
       // Allow new asset categories explicitly to keep private files out of the site.
       if (
-        !['index.html', 'draws.json', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(relative) &&
+        !['index.html', 'draws.json', 'favicon.ico', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(
+          relative,
+        ) &&
         !/^assets\/[\w-]+\.(js|css)$/.test(relative)
       ) {
         throw new Error('Unexpected file in the build.');
