@@ -19,7 +19,7 @@ Reveal one assigned gift recipient through a joyful Christmas experience.
 - React, TypeScript and Vite, deployed as static files on GitHub Pages.
 - Personal results are decrypted in the browser with the key in the URL fragment.
 - Preserve campaign generation, encrypted data, SMTP delivery and recovery workflows.
-- Code, documentation and internal errors are in English. The web UI is in French.
+- Code, documentation and internal errors are in English. The web UI and emails are in French.
 - The browser title is exactly `Secret Santa`.
 - Keep code readable, focused and maintainable.
 

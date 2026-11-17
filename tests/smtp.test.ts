@@ -158,8 +158,9 @@ it('sends the standalone SMTP test only to the configured sender', async () => {
   });
   expect(parsed.to).toMatchObject({ value: [{ address: env.SANTA_SENDER_EMAIL }] });
   expect(parsed.from?.value[0].address).toBe(env.SANTA_SENDER_EMAIL);
-  expect(parsed.subject).toBe('Secret Santa: SMTP test');
-  expect(parsed.text).toContain('No draw has been generated or changed.');
+  expect(parsed.subject).toBe('Secret Santa: test SMTP');
+  expect(parsed.text).toContain('Le test SMTP de Secret Santa a fonctionné');
+  expect(parsed.text).toContain('Aucun tirage n’a été créé ou modifié');
   expect(parsed.attachments).toHaveLength(0);
   expect(parsed.messageId).toMatch(/^<smtp-test\.[a-f0-9-]+@secret-santa\.invalid>$/);
 });

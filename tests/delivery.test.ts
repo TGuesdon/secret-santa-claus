@@ -28,6 +28,11 @@ it('builds a Unicode multipart mail with matching link, text and CID QR', async 
   expect(parsed.text).toContain(campaign.records[0].url);
   expect(parsed.html).toContain('Alice &lt;3');
   expect(parsed.html).toContain('cid:santa-qr');
+  expect(parsed.subject).toBe('Secret Santa: test');
+  expect(parsed.text).toContain('Ton tirage Secret Santa est prêt');
+  expect(parsed.text).toContain('Garde ce lien secret');
+  expect(parsed.html).toContain('Révéler mon tirage');
+  expect(parsed.html).toContain('lang="fr"');
   expect(parsed.attachments).toHaveLength(1);
   const png = PNG.sync.read(parsed.attachments[0].content);
   const qr = jsQR(new Uint8ClampedArray(png.data), png.width, png.height);

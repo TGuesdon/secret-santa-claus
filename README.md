@@ -60,8 +60,8 @@ before pausing. Blocked, unavailable or disabled audio uses a silent reveal cloc
 Motion can be paused, and the system's reduced-motion preference disables movement.
 Both controls remain available after the result appears.
 
-The web interface is in French. Code, documentation, internal errors and emails stay
-in English. The browser title is exactly `Secret Santa`.
+The web interface and emails are in French. Code, documentation and internal errors
+stay in English. The browser title is exactly `Secret Santa`.
 
 The display font and illustration are self-hosted. Asset origins and the generation
 prompt are documented in `src/assets/ASSETS.md`; no external image or font request

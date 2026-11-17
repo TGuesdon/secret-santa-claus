@@ -79,23 +79,27 @@ export async function composeMail(
     margin: 4,
     errorCorrectionLevel: 'M',
   });
-  const greeting = `Hello ${record.name}!`;
+  const greeting = `Ho ho ho ${record.name} !`;
   const instruction =
-    'Your Secret Santa draw is ready. Open your personal link to discover your gift recipient.';
-  const privacyNote = 'Keep this link private: anyone with it can reveal your draw.';
+    'Ton tirage Secret Santa est prêt ! Ouvre ton lien personnel pour découvrir à qui tu vas offrir un cadeau.';
+  const privacyNote =
+    'Garde ce lien secret : toute personne qui le possède peut découvrir ton tirage.';
   const html = `
+    <div lang="fr">
     <p>${escapeHtml(greeting)}</p>
     <p>${instruction}</p>
-    <p><a href="${escapeHtml(record.url)}">Reveal my draw</a></p>
-    <p>You can also scan this QR code:</p>
-    <img src="cid:santa-qr" alt="Your personal link as a QR code" width="240" height="240">
+    <p><a href="${escapeHtml(record.url)}">Révéler mon tirage</a></p>
+    <p>Tu peux aussi scanner ce QR code :</p>
+    <img src="cid:santa-qr" alt="Ton lien personnel sous forme de QR code" width="240" height="240">
     <p>${privacyNote}</p>
+    </div>
   `;
 
   return new MailComposer({
     from: { name: sender.name, address: sender.email },
     to: { name: record.name, address: record.email },
     subject: `Secret Santa: ${campaignId}`,
+    headers: { 'Content-Language': 'fr' },
     messageId: `<${record.id}.${campaignId}@secret-santa.invalid>`,
     text: `${greeting}\n\n${instruction}\n\n${record.url}\n\n${privacyNote}`,
     html,
@@ -198,9 +202,10 @@ export async function sendTestMail(
   const mime = await new MailComposer({
     from: { name: sender.name, address: sender.email },
     to: { address: recipient },
-    subject: 'Secret Santa: SMTP test',
+    subject: 'Secret Santa: test SMTP',
+    headers: { 'Content-Language': 'fr' },
     messageId: `<smtp-test.${randomUUID()}@secret-santa.invalid>`,
-    text: 'Your Secret Santa SMTP test worked!\n\nNo draw has been generated or changed.',
+    text: 'Le test SMTP de Secret Santa a fonctionné !\n\nAucun tirage n’a été créé ou modifié.',
   })
     .compile()
     .build();

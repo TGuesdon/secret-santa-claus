@@ -93,7 +93,7 @@ The illustration, waving Santa, drifting gifts, stars, snow and swinging bulbs s
 action. The recipient takes center stage after the musical build-up. Sound and
 motion remain optional, with the same readable result in silent or reduced-motion
 use. All web interface copy and user-facing errors are French; documentation,
-internal errors and emails remain English. The browser title is exactly `Secret Santa`.
+internal errors remain English. Emails are French. The browser title is exactly `Secret Santa`.
 
 **Key Characteristics:**
 

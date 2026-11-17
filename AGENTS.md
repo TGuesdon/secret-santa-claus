@@ -33,8 +33,8 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
 Readability takes priority over brevity and line count. Code must not need to be mentally
 unpacked before a maintainer can understand it.
 
-- Write code, comments, documentation, internal errors and emails in English.
-  The web interface and its user-facing errors are in French. Keep the browser title exactly `Secret Santa`.
+- Write code, comments, documentation and internal errors in English.
+  The web interface, its user-facing errors and emails are in French. Keep the browser title exactly `Secret Santa`.
   Preserve user-provided reference resources as supplied.
 - Use one declaration and one statement per line. Do not chain variable declarations.
 - Always use braces around conditionals and loops, including single-statement branches.
