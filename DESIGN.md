@@ -1,247 +1,88 @@
----
-name: Secret Santa
-description: An exuberant Christmas cartoon stage for one personal surprise.
-colors:
-  candy-red: '#ce2945'
-  candy-red-hover: '#cf233f'
-  candy-red-active: '#a91835'
-  candy-red-disabled: '#8d3557'
-  night: '#173b78'
-  gold: '#ffd36a'
-  ivory: '#fff8e9'
-  muted: '#d7e5ff'
-  control-surface: '#183366'
-  control-border: '#6c93cf'
-  control-hover: '#234e91'
-  campaign-field: '#102653'
-  campaign-divider: '#41699e'
-typography:
-  display:
-    fontFamily: 'Fredoka, sans-serif'
-    fontSize: 'clamp(46px, 5.5vw, 78px)'
-    fontWeight: 500
-    lineHeight: 1.02
-    letterSpacing: '-0.035em'
-  config-title:
-    fontFamily: 'Fredoka, sans-serif'
-    fontSize: 'clamp(36px, 4vw, 56px)'
-    fontWeight: 500
-    lineHeight: 1.08
-  recipient:
-    fontFamily: 'Fredoka, sans-serif'
-    fontSize: 'clamp(40px, 6vw, 78px)'
-    fontWeight: 600
-    lineHeight: 1.06
-    letterSpacing: '-0.025em'
-  brand:
-    fontFamily: 'Fredoka, sans-serif'
-    fontSize: 25px
-    fontWeight: 500
-    lineHeight: 1
-    letterSpacing: '-0.025em'
-  body:
-    fontFamily: "'Trebuchet MS', system-ui, sans-serif"
-    lineHeight: 1.5
-  button:
-    fontFamily: 'Fredoka, sans-serif'
-    fontSize: 20px
-    fontWeight: 500
-    lineHeight: 1.25
-  control:
-    fontFamily: "'Trebuchet MS', system-ui, sans-serif"
-    fontSize: 13px
-  label:
-    fontFamily: "'Trebuchet MS', system-ui, sans-serif"
-    fontSize: 14px
-    fontWeight: 700
-rounded:
-  button: 14px
-  field: 14px
-  panel: 14px
-  chip: 24px
-  control: 24px
-  tag: 3px
-  recipient: 50%
-spacing:
-  icon-gap: 8px
-  control-gap: 10px
-  compact: 20px
-  content: 24px
-  desktop-gutter: 48px
-  mobile-gutter: 20px
-components:
-  button-primary:
-    backgroundColor: '{colors.candy-red}'
-    textColor: '{colors.ivory}'
-    typography: '{typography.button}'
-    rounded: '{rounded.button}'
-    padding: '17px 29px'
-  button-primary-hover:
-    backgroundColor: '{colors.candy-red-hover}'
-  button-primary-active:
-    backgroundColor: '{colors.candy-red-active}'
-  button-primary-disabled:
-    backgroundColor: '{colors.candy-red-disabled}'
-  button-quiet:
-    backgroundColor: '{colors.control-surface}'
-    textColor: '{colors.ivory}'
-    typography: '{typography.control}'
-    rounded: '{rounded.control}'
-    padding: '9px 14px'
-  campaign-field:
-    backgroundColor: '{colors.campaign-field}'
-    textColor: '{colors.ivory}'
-    typography: '{typography.body}'
-    rounded: '{rounded.field}'
-    padding: '11px 12px'
-  campaign-panel:
-    backgroundColor: '{colors.control-surface}'
-    textColor: '{colors.ivory}'
-    rounded: '{rounded.panel}'
-    padding: '28px'
-  exclusion-chip:
-    backgroundColor: '{colors.control-hover}'
-    textColor: '{colors.ivory}'
-    typography: '{typography.control}'
-    rounded: '{rounded.chip}'
-    padding: '8px 12px'
-  recipient:
-    backgroundColor: '{colors.night}'
-    textColor: '{colors.ivory}'
-    rounded: '{rounded.recipient}'
-    padding: '24px 15px 28px'
----
-
-# Design System: Secret Santa
+# Design System for Secret Santa
 
 ## Overview
 
-**Creative North Star: "Kitsch Christmas Game Stage"**
+Secret Santa is a deliberately kitsch Christmas cartoon stage for a personal surprise. Santa,
+reindeer, fir trees and fairy lights frame the delivery of a sealed letter. The campaign editor
+uses the same palette and typography with a calmer layout for organizing a draw.
 
-A Christmas-night blue stage gives the original Santa, reindeer, fir trees, fairy lights, and presents room to form an exuberant cartoon scene. Rounded display lettering and warm festive accents make the reveal feel like a personal Christmas game: generous, playful, and deliberately kitsch.
-
-The illustration and animated gift frame one clear focal point. Before the reveal, the red action leads; afterward, the recipient's name takes center stage. The campaign editor carries the same palette and lettering into a calmer, more task-focused layout with restrained decoration.
-
-**The One Reveal Focus Rule.** Keep the festive scene around one clear focal point: the reveal action before the result, then the recipient's name.
-
-**Key Characteristics:**
-
-- Christmas-night blue, candy red, festive gold, and warm ivory.
-- Original picture-book Santa and reindeer art with a separate animated gift.
-- Rounded Fredoka display type paired with familiar sans-serif body lettering.
-- Tactile controls and an uncluttered campaign editor in the same visual world.
+The [React component library](src/components/) and its styles are the source of truth for the
+design system. This guide explains how to use those components. [PRODUCT.md](PRODUCT.md) describes
+the audience and product goals. [Desktop and mobile captures](docs/screenshots/README.md) show
+the experience in the browser.
 
 ## Colors
 
-The palette uses Christmas-night blue as its broad canvas, with candy red and festive gold reserved for lively accents and ivory lettering for clarity.
+Use the shared tokens in [src/style.css](src/style.css).
 
-### Primary
-
-- **Candy red:** carries the primary reveal action and the compact gift mark. Its hover, pressed, and disabled states stay within the same red family.
-
-### Secondary
-
-- **Christmas-night blue:** covers the main experience and the recipient surface. A darker blue supports controls and fields; lighter blue shapes frame the scene.
-
-### Tertiary
-
-- **Festive gold:** highlights the second line of headings, the recipient's name, the present ribbon, stars, and keyboard focus.
-
-### Neutral
-
-- **Warm ivory:** the main text and primary-action foreground.
-- **Ice blue:** supporting copy, control outlines, and footer details.
-- **Deep blue surfaces:** separate quiet controls, fields, and editor panels from the page canvas.
-
-**The Gift Palette Rule.** Let blue carry most of the surface; use red and gold as small, high-salience accents.
+- Christmas-night blue (`--night`) is the stage canvas. Ice blue (`--muted`) supports secondary copy.
+- Candy red (`--red`) marks the brand and primary editor actions. Burgundy and red give the
+  curtains, sleigh and wax seal their depth.
+- Festive gold (`--gold`) highlights the second line of headings, stars, trim and focus rings.
+- Warm ivory (`--text` and `--cream`) is the main foreground on blue and the paper color. The
+  recipient name uses burgundy on the ivory sheet.
+- The editor and quiet controls use the shared blue control tokens for surfaces, borders and hover.
 
 ## Typography
 
-**Display Font:** Fredoka, with a sans-serif fallback.
+Fredoka gives the wordmark, headings, actions and recipient name their rounded character.
+Trebuchet MS with system fallbacks supports body copy, controls and form labels.
 
-**Body Font:** Trebuchet MS, followed by system UI sans-serif fallbacks.
-
-Fredoka brings the rounded, cartoon character to headings, the wordmark, actions, and the recipient name. Familiar body lettering keeps instructions, controls, and longer editor content easy to scan.
-
-### Hierarchy
-
-- **Display** (weight 500, 46–78px fluid, line-height 1.02): balanced two-line headings on the reveal stage.
-- **Configuration title** (weight 500, 36–56px fluid, line-height 1.08): the editor's welcoming page title, with a narrower mobile range.
-- **Recipient** (weight 600, 40–78px fluid, line-height 1.06): the gold name in the result oval; long names may wrap anywhere.
-- **Brand** (weight 500, 25px desktop): compact wordmark with a gift icon and red punctuation.
-- **Body** (16px desktop, 14px mobile, line-height 1.5): descriptions and guidance; supporting notes step down to 12–14px.
-- **Controls and labels** (13–14px): compact, readable text with bold form labels and clear state labels.
-
-**The Name First Rule.** Keep the revealed recipient in the strongest type size and contrast on the result view.
+The invitation uses a smaller two-line heading above the actionable letter. After the reveal,
+the recipient name gets the strongest emphasis on the sheet and can wrap for long names.
 
 ## Layout
 
-The reveal page is a full-height vertical composition. A wide header and footer frame a centered experience; the header caps at 1600px, the main column at 1440px, and the illustrated stage at 1000px. Desktop outer gutters are 48px, with 24px around the main content.
+The stage fills the viewport, with a centered scene framed by the brand, sound and motion controls,
+and footer. The mobile layout keeps the scene wide and presents the header controls as icons with
+accessible names. The sheet grows with its content. Stage breakpoints live in
+[src/style.css](src/style.css) and [StageCeremony.css](src/components/StageCeremony.css).
 
-At 700px and below, the reveal page uses 20px gutters, icon-only control labels, a wider illustration, and a smaller gift and Santa. At 380px and below, the heading and scene tighten again. At wide, tall sizes, the stage gains extra height. The result view expands naturally for long names instead of clipping them.
-
-The campaign editor shares the header width and palette but uses a two-column workspace: a campaign selector beside the editing panel. At 900px and below, the workspace becomes a single column; at 600px and below, gutters narrow, participant fields stack, and the main action fills the available width. Its content uses clear groups, short guidance lines, and consistent spacing rather than the reveal page's decorative stage.
+The editor places a campaign selector next to the editing panel on wide screens. Narrow layouts
+stack the workspace and the participant fields. The editor's layout and form styles live in
+[src/config/config.css](src/config/config.css).
 
 ## Elevation & Depth
 
-Depth is illustrative and tactile. Layered scenery and blue geometric outlines establish the stage; inset shading gives the CSS gift volume; soft shadows ground the gift and lift the primary action. The editor uses tonal separation and thin outlines to group work without competing with the Christmas scene.
-
-### Shadow Vocabulary
-
-- **Primary action:** `0 8px 18px #071b4970`; hover increases the lift to `0 9px 24px #a0253238`.
-- **Heading:** `0 4px 3px #102b60` adds separation against the illustrated stage.
-- **Gift body:** `inset -16px 0 0 #aa2d38, inset 0 -12px 0 #b32e38` creates drawn parcel shading.
-- **Gift ground:** a warm translucent ellipse with a 10px blur anchors the present.
-
-**The Illustrated Depth Rule.** Use shadows to ground or lift an element; let artwork, outlines, and inset shading do the rest.
+The curtains use shaded folds, and layered scenery gives Santa room to move from the sky to the
+foreground. Soft shadows separate the envelope and sheet from the illustration. The editor groups
+content with blue surfaces and fine borders.
 
 ## Shapes
 
-The form language is rounded and tactile. Primary buttons, fields, panels, and campaign selections use 14px corners; quiet controls and exclusion chips use pill shapes (24px). The gift tag has a small paper-like corner (3px), while the result sits in a broad oval. Thin borders organize editor surfaces, and gold focus outlines remain visible against blue.
-
-The present combines a softly rounded box, thick outline, inset shading, looped ribbon shapes, and a tilted tag. Stars, snow, bulbs, and oversized background geometry repeat circles, arcs, and rounded silhouettes.
+Rounded controls, fields and panels carry the cartoon style into the editor. Quiet controls and
+exclusion chips use pill shapes. The envelope has rounded corners, a folded flap and a dark-red wax
+seal. The result sheet has a thin border and ruled edges.
 
 ## Components
 
-### Buttons
+### Shared controls
 
-The reveal action is the boldest control: candy red, ivory Fredoka lettering, generous horizontal padding (17px 29px), and a minimum height of 60px. Hover and pressed states deepen the red; the disabled state loses its shadow. The compact editor version keeps the same treatment with smaller padding and type. Quiet controls use a dark-blue pill, a thin blue border, and a gold keyboard outline.
+- [Brand](src/components/Brand.tsx) combines the gift mark, wordmark and red punctuation.
+- [Button](src/components/Button.tsx) provides `primary` for prominent editor actions and `quiet`
+  for supporting actions. The stage sound and motion controls share the quiet-button styles.
+- [FormField](src/components/FormField.tsx) associates the input with its label, hint and validation
+  message. Preserve the visible gold focus treatment on keyboard-reachable controls.
+- [Icon](src/components/Icons.tsx) provides the shared SVG icon set.
 
-### Cards / Containers
+### Curtain, delivery and reveal
 
-The campaign editor panel uses a dark-blue surface, a thin blue divider, and 28px desktop padding, reducing to 20px 16px on mobile. The active campaign choice adds a gold outline and a lighter blue fill. Participant groups remain open and separated by fine dividers rather than nested cards.
+1. [StageCurtain](src/components/StageCurtain.tsx) opens from a click or tap on the fabric or
+   keyboard activation. The panels repeatedly part just enough to hint at the scenery. Opening
+   them starts the intro loop when sound is enabled.
+2. [ChristmasScene](src/components/ChristmasScene.tsx) brings Santa in from the upper-left corner.
+   The sleigh weaves down, drops the letter and loops out to the right. The invitation appears
+   when the flight ends. A small recurring tremble draws attention to the letter.
+3. Opening the letter builds toward the reveal cue in the
+   [soundtrack controller](src/lib/soundtrack.ts). The dark-red seal breaks, the flap opens and an
+   ivory sheet rises with the recipient name. Confetti follows in successive bursts and a larger
+   finale.
 
-### Inputs / Fields
+Preserve the reveal when sound is muted or unavailable. The motion control and reduced-motion
+preference skip the flight and decorative animation while keeping the letter and result usable.
 
-Fields use a dark-blue fill, a blue border, and 14px corners. Labels are bold; helper text sits above the field when present. Keyboard focus gains a 3px gold outline, and invalid fields shift their border to gold while the message remains adjacent to the field.
+### Campaign editor
 
-### Chips
-
-Exclusion chips use a lighter blue fill and outline, wrap onto additional rows, and keep their text aligned to the start. They remain clearly interactive controls rather than decorative tags.
-
-### Navigation
-
-Campaign choices form a compact selector with a gift icon, campaign name, and participant count. The active choice uses the gold outline and lighter blue surface; on narrower screens the choices form a responsive grid before stacking with the workspace.
-
-### Christmas Scene and Recipient
-
-The original illustration remains the visual anchor. Santa waves above a separately animated parcel; lights, stars, snow, and drifting gifts add motion behind the action. The reveal grows and rattles the parcel, then settles it as the lid opens and the recipient arrives. Motion respects reduced-motion settings and the user pause control.
-
-The recipient sits in a gold-outlined blue oval with a clear label, large gold name, and short supporting line. The scenery recedes after reveal, while the result surface grows naturally on mobile and for long names.
-
-## Do's and Don'ts
-
-### Do:
-
-- **Do** preserve the saturated blue stage, candy-red action, festive-gold accents, and warm ivory text.
-- **Do** keep the reveal action or recipient as the strongest focal point for its state.
-- **Do** preserve the original Christmas illustrations and the gift's layered, tactile construction.
-- **Do** keep gold keyboard focus visible and honor reduced-motion preferences.
-- **Do** keep the campaign editor calmer than the reveal page while retaining the same palette and type.
-
-### Don't:
-
-- **Don't** bring back the rejected cream page background.
-- **Don't** let decorative stars, gifts, or motion obscure the action, editor content, or recipient.
-- **Don't** clip long recipient names or narrow-screen form content.
-- **Don't** remove visible focus states or rely on color alone to indicate the active campaign.
+Use the shared brand, controls and fields in [ConfigApp](src/config/ConfigApp.tsx). The selected
+campaign uses a gold outline and lighter blue fill. Participant fields are grouped with fine
+dividers, and exclusion chips wrap as needed.

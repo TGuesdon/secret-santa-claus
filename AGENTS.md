@@ -6,17 +6,17 @@ A static family Secret Santa built with React, TypeScript and Vite, hosted on Gi
 Node scripts generate assignments, encrypt individual results, create personal links and QR
 codes, and send emails through Gmail SMTP with an app password. The same commands run locally and in
 a manually triggered GitHub Actions workflow. The UI is a responsive Christmas cartoon
-experience with direct access, best-effort intro autoplay and a reveal at 6.8 seconds.
+experience with a curtain entrance, a sleigh delivery and a musical letter reveal.
 
 ## Repository map
 
 - `src/`: Vite root with HTML routes, React UI and shared browser-compatible encryption, links and draw loading.
 - `src/config/`: React UI and `/config/` HTML entry for editing campaign JSON, imports and exports.
-- `src/components/`: shared brand/buttons/form fields, decorative Christmas scene and SVG icons.
+- `src/components/`: the React component library, including shared controls and the Christmas scene.
 - `src/lib/participants.ts` and `assignment.ts`: shared CLI/browser validation and matching.
 - `src/lib/soundtrack.ts`: intro/jingle playback, drop timing, fades and silent fallback.
 - `src/assets/`: self-hosted display font and original Christmas illustration.
-- `PRODUCT.md` and `DESIGN.md`: product constraints and the visual system.
+- `PRODUCT.md` and `DESIGN.md`: product intent and visual guidance.
 - `scripts/`: campaigns, encrypted archives, private files, SMTP email delivery and CLI.
 - `fixtures/demo.json`: four fictional participants with intentionally public test keys.
 - `public/draws.json`: fictional demo encrypted draw.
@@ -29,6 +29,15 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
   Preserve user-provided resources unless the task requires changes.
 - `docs/superpowers/`: approved design, implementation plan and progress notes.
 - `docs/screenshots/`: desktop and mobile captures using fictional demo participants.
+
+## Design system
+
+- The React component library in `src/components/` and its styles are the source of truth for
+  appearance, interaction and accessibility. Shared tokens and base styles live in `src/style.css`.
+- Reuse shared components, tokens and variants. Make changes to shared patterns in the library so
+  the screens that use them inherit the change.
+- Use `PRODUCT.md` for product intent and `DESIGN.md` for visual guidance. Use these Markdown
+  files and the implemented UI when applying Impeccable. Skip Impeccable JSON sidecars and sync.
 
 ## Readability
 
