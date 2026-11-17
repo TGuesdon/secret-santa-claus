@@ -1,3 +1,5 @@
+import { wording } from './locales/fr';
+import { DrawError } from './lib/draw-error';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ChristmasScene, Snow } from './components/ChristmasScene';
 import { FestiveBackdrop } from './components/FestiveBackdrop';
@@ -29,24 +31,6 @@ type RevealState =
   | { status: 'ready' | 'opening' }
   | { status: 'success'; result: Result }
   | { status: 'error'; message: string };
-
-function revealErrorMessage(error: unknown): string {
-  if (!(error instanceof Error)) {
-    return 'Impossible de révéler ton tirage. Réessaie dans un instant.';
-  }
-
-  // Keep shared validation errors in English; translate only at the UI boundary.
-  switch (error.message) {
-    case 'No available draw matches this link.':
-      return 'Aucun tirage ne correspond à ce lien. Demande ton lien personnel à l’organisateur.';
-    case 'Unable to decrypt this draw. Check your personal link.':
-      return 'Impossible de déchiffrer ce tirage. Vérifie que ton lien personnel est complet.';
-    case 'Unsupported draw version.':
-      return 'Ce tirage utilise un format incompatible. Contacte l’organisateur.';
-    default:
-      return 'Impossible de charger ton tirage. Vérifie ta connexion et réessaie.';
-  }
-}
 
 function Experience({ fragment, search }: { fragment: string; search: string }) {
   const [state, setState] = useState<RevealState>({ status: 'ready' });
@@ -83,8 +67,8 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
   const opening = state.status === 'opening';
   const revealed = state.status === 'success';
   const animationsOff = reducedMotion || motionPaused;
-  const soundLabel = soundBlocked ? 'Activer le son' : 'Son';
-  const soundState = muted ? 'coupé' : 'activé';
+  const soundLabel = soundBlocked ? wording.sound.enable : wording.sound.label;
+  const soundState = muted ? wording.sound.muted : wording.sound.enabled;
 
   useEffect(() => {
     active.current = true;
@@ -144,7 +128,10 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
         soundtrack.current?.retry();
         setState({
           status: 'error',
-          message: revealErrorMessage(error),
+          message:
+            error instanceof DrawError
+              ? wording.errors.draw[error.code]
+              : wording.errors.unexpected,
         });
       }
     }
@@ -152,33 +139,33 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
 
   let heading = (
     <>
-      Un cadeau.
+      {wording.ready.heading}
       <br />
-      <em>Un joli secret.</em>
+      <em>{wording.ready.emphasis}</em>
     </>
   );
-  let description = 'Ho ho ho… à qui vas-tu faire plaisir cette année ?';
+  let description: string = wording.ready.description;
 
   if (opening) {
     heading = (
       <>
-        Roulement
+        {wording.opening.heading}
         <br />
-        <em>de grelots…</em>
+        <em>{wording.opening.emphasis}</em>
       </>
     );
-    description = 'Les lutins s’agitent. Le suspense est à son comble !';
+    description = wording.opening.description;
   }
 
   if (revealed) {
     heading = (
       <>
-        Cette année,
+        {wording.revealed.heading}
         <br />
-        <em>tu gâtes…</em>
+        <em>{wording.revealed.emphasis}</em>
       </>
     );
-    description = `Joyeux Noël ${state.result.participantName} ! Voici ta mission secrète.`;
+    description = wording.revealed.description(state.result.participantName);
   }
 
   return (
@@ -197,7 +184,7 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
         <h1 className="brand">
           <Icon name="gift" />
           <span>
-            Secret Santa
+            {wording.brand}
             <span className="brand-dot" aria-hidden="true">
               .
             </span>
@@ -223,15 +210,15 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
           <button
             className="quiet-button motion-button"
             onClick={() => setMotionPaused(!motionPaused)}
-            aria-label="Animations"
+            aria-label={wording.motion.label}
             aria-pressed={!animationsOff}
             disabled={reducedMotion}
           >
             <Icon name={animationsOff ? 'play' : 'pause'} />
             <span>
-              Animations{' '}
+              {wording.motion.label}{' '}
               <span className="control-state" aria-hidden="true">
-                {animationsOff ? 'en pause' : 'activées'}
+                {animationsOff ? wording.motion.paused : wording.motion.enabled}
               </span>
             </span>
           </button>
@@ -247,11 +234,9 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
         <ChristmasScene opening={opening} revealed={revealed}>
           {revealed && (
             <div className="recipient" role="status" ref={recipient} tabIndex={-1}>
-              <span className="recipient-label">Ton cadeau est pour</span>
+              <span className="recipient-label">{wording.revealed.recipientLabel}</span>
               <strong>{state.result.recipientName}</strong>
-              <span className="recipient-note">
-                À toi de lui mettre des étoiles plein les yeux.
-              </span>
+              <span className="recipient-note">{wording.revealed.recipientNote}</span>
             </div>
           )}
         </ChristmasScene>
@@ -261,36 +246,26 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
             <div className="link-message" role={invalid ? 'alert' : undefined}>
               {invalid ? (
                 <>
-                  <h3>Oups, les lutins ont perdu un bout du lien.</h3>
-                  <p>
-                    Ce lien personnel est incomplet ou invalide. Demande le lien complet à
-                    l’organisateur.
-                  </p>
+                  <h3>{wording.link.invalidHeading}</h3>
+                  <p>{wording.link.invalidDescription}</p>
                 </>
               ) : (
-                <p>
-                  Il te faut ton lien personnel pour découvrir ton tirage. Ouvre le lien reçu par
-                  e-mail ou scanne ton QR code.
-                </p>
+                <p>{wording.link.missing}</p>
               )}
             </div>
           )}
           {hasLink && !revealed && (
             <>
               <button className="primary-button" onClick={reveal} disabled={opening}>
-                {opening ? 'Les lutins déballent…' : 'Révéler mon tirage'}
+                {opening ? wording.opening.action : wording.ready.action}
                 {!opening && <Icon name="gift" />}
               </button>
-              <p className="action-note">
-                {opening
-                  ? 'Chut… la surprise arrive !'
-                  : 'Un clic, des grelots, et le secret est à toi.'}
-              </p>
+              <p className="action-note">{opening ? wording.opening.note : wording.ready.note}</p>
             </>
           )}
           {revealed && (
             <p className="success-note">
-              <Icon name="star" /> Motus et boule de neige. Ça reste entre nous !
+              <Icon name="star" /> {wording.revealed.note}
             </p>
           )}
           {state.status === 'error' && (
@@ -298,17 +273,13 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
               {state.message}
             </p>
           )}
-          {soundBlocked && (
-            <p className="audio-message">
-              Envie des grelots ? Active le son. Ton tirage fonctionne aussi sans musique.
-            </p>
-          )}
+          {soundBlocked && <p className="audio-message">{wording.sound.blocked}</p>}
         </div>
       </main>
 
       <footer className="site-footer">
-        <span>Préparé avec amour et quelques lutins surexcités.</span>
-        <span>La magie, c’est de faire plaisir.</span>
+        <span>{wording.footer.credits}</span>
+        <span>{wording.footer.motto}</span>
       </footer>
     </div>
   );

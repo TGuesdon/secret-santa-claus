@@ -173,7 +173,7 @@ it('rejects malformed links before fetching', async () => {
     loadDraw('#v1.bad.link', '/repo/draws.json', async () => {
       throw new Error('must not fetch');
     }),
-  ).rejects.toThrow(/invalid/);
+  ).rejects.toMatchObject({ code: 'invalid-link' });
 });
 
 it('handles missing IDs, unsupported schemas, network errors and HTTP failures', async () => {
@@ -181,21 +181,21 @@ it('handles missing IDs, unsupported schemas, network errors and HTTP failures',
 
   await expect(
     loadDraw(fragment, '/repo/draws.json', async () => new Response('{"version":1,"entries":{}}')),
-  ).rejects.toThrow(/No available draw/);
+  ).rejects.toMatchObject({ code: 'not-found' });
   await expect(
     loadDraw(fragment, '/repo/draws.json', async () => new Response('{"version":2}')),
-  ).rejects.toThrow(/version/);
+  ).rejects.toMatchObject({ code: 'unsupported-version' });
   await expect(
     loadDraw(fragment, '/repo/draws.json', async () => {
       throw new Error('offline');
     }),
-  ).rejects.toThrow(/connection/);
+  ).rejects.toMatchObject({ code: 'load-failed' });
   await expect(
     loadDraw(fragment, '/repo/draws.json', async () => new Response('', { status: 404 })),
-  ).rejects.toThrow(/connection/);
+  ).rejects.toMatchObject({ code: 'load-failed' });
   await expect(
     loadDraw(fragment, '/repo/draws.json', async () => new Response('<html>bad</html>')),
-  ).rejects.toThrow(/connection/);
+  ).rejects.toMatchObject({ code: 'load-failed' });
 });
 
 it('shows the French reveal immediately and recovers from blocked autoplay', async () => {
@@ -242,4 +242,27 @@ it('rejects an invalid campaign query before fetching', () => {
 
   expect(screen.queryByRole('button', { name: /révéler/i })).toBeNull();
   expect(fetcher).not.toHaveBeenCalled();
+});
+
+it.each([
+  ['{"version":2}', /format incompatible/],
+  ['{"version":1,"entries":{}}', /Aucun tirage/],
+])('maps domain failures to French copy for response %s', async (body, message) => {
+  vi.stubGlobal('fetch', async () => new Response(body));
+  window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+
+  expect((await screen.findByRole('alert')).textContent).toMatch(message);
+});
+
+it('does not interpret diagnostic messages as domain error codes', async () => {
+  vi.stubGlobal('fetch', async () => {
+    throw new Error('Unsupported draw version.');
+  });
+  window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+
+  expect((await screen.findByRole('alert')).textContent).toMatch(/Vérifie ta connexion/);
 });
