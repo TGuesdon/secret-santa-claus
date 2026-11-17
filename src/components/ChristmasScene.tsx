@@ -1,6 +1,9 @@
 ﻿import type { CSSProperties, ReactNode } from 'react';
 import friends from '../assets/christmas-friends.webp';
+import friendsSmall from '../assets/christmas-friends-640.webp';
+import friendsMedium from '../assets/christmas-friends-1024.webp';
 import santa from '../assets/santa.webp';
+import santaSmall from '../assets/santa-256.webp';
 import { Icon } from './Icons';
 
 type SceneProps = {
@@ -56,11 +59,21 @@ export function ChristmasScene({ opening, revealed, children }: SceneProps) {
   return (
     <div className={`christmas-scene ${stateClass}`}>
       <div className="scene-illustration" aria-hidden="true">
-        <img src={friends} alt="" width="1536" height="1024" fetchPriority="high" />
+        <img
+          src={friendsMedium}
+          srcSet={`${friendsSmall} 640w, ${friendsMedium} 1024w, ${friends} 1536w`}
+          sizes="(max-width: 700px) 112vw, (max-width: 1048px) calc(100vw - 48px), 1000px"
+          alt=""
+          width="1536"
+          height="1024"
+          fetchPriority="high"
+        />
       </div>
       <img
         className="santa-illustration"
         src={santa}
+        srcSet={`${santaSmall} 256w, ${santa} 512w`}
+        sizes="(max-width: 700px) 180px, 230px"
         alt=""
         width="512"
         height="512"

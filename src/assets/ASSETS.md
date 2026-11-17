@@ -55,4 +55,35 @@ It is distributed under the SIL Open Font License, included in `FONT-LICENSE.txt
 ## Audio and favicon
 
 The two MP3 files and Santa favicon in `public/` were supplied by the repository
-owner. This UI change preserves them unchanged.
+owner. The initial UI change preserved them unchanged; the later authorized
+audio compression is documented below.
+
+## Loading optimizations (2026-11-17)
+
+The source WebP illustrations and TTF remain available in this directory. Only
+imported assets are emitted by Vite. Responsive derivatives use these commands:
+
+```sh
+cwebp -q 82 -m 6 -resize 640 0 src/assets/christmas-friends.webp -o src/assets/christmas-friends-640.webp
+cwebp -q 82 -m 6 -resize 1024 0 src/assets/christmas-friends.webp -o src/assets/christmas-friends-1024.webp
+cwebp -q 84 -m 6 -resize 256 0 src/assets/santa.webp -o src/assets/santa-256.webp
+```
+
+`fredoka.woff2` is a lossless WOFF2 conversion of `fredoka.ttf` using FontTools
+4.68.0 and Brotli 1.2.1. All characters and variable weight axes are retained.
+The original font license still applies. No font subsetting is performed, so
+participant names keep the source font's character coverage.
+
+The owner authorized audio compression on 2026-11-17. Both public MP3s were
+re-encoded from the supplied originals to 128 kbit/s stereo at 44.1 kHz with
+FFmpeg and libmp3lame. The original files remain in Git history. There is no
+WAV source in this repository; decoding MP3 to WAV would not recover quality.
+
+```sh
+ffmpeg -i original.mp3 -map_metadata -1 -c:a libmp3lame -b:a 128k optimized.mp3
+```
+
+The intro decreases from 122,880 to 62,318 bytes, and the jingle from 1,922,239
+to 1,282,341 bytes. Music, fades, looping and the 6.8-second reveal are retained.
+MP3 encoder padding can slightly change the container duration; gapless metadata
+preserves the decoded audio duration.

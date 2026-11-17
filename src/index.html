@@ -4,11 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
+    <!-- Paint the existing background before styles or React finish loading. -->
+    <style>
+      html {
+        background: #173b78;
+        color: #fff8e9;
+      }
+      body {
+        margin: 0;
+      }
+    </style>
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/christmas-friends-1024.webp"
+      imagesrcset="
+        /assets/christmas-friends-640.webp   640w,
+        /assets/christmas-friends-1024.webp 1024w,
+        /assets/christmas-friends.webp      1536w
+      "
+      imagesizes="(max-width: 700px) 112vw, (max-width: 1048px) calc(100vw - 48px), 1000px"
+      fetchpriority="high"
+    />
     <link rel="icon" type="image/x-icon" href="%BASE_URL%favicon.ico" />
     <title>Secret Santa</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>Active JavaScript pour découvrir ton tirage Secret Santa.</noscript>
     <script type="module" src="/main.tsx"></script>
   </body>
 </html>

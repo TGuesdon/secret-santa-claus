@@ -77,7 +77,7 @@ export async function inspectDist(
           'jingle_bell.mp3',
           'intro_loop.mp3',
         ].includes(relative) &&
-        !/^assets\/[\w-]+\.(js|css|webp|ttf)$/.test(relative)
+        !/^assets\/[\w-]+\.(js|css|webp|ttf|woff2)$/.test(relative)
       ) {
         throw new Error('Unexpected file in the build.');
       }
