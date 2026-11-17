@@ -65,6 +65,8 @@ unpacked before a maintainer can understand it.
 - `npm run santa:mail:test -- --to <email>`: explicitly send one real SMTP test email;
   the recipient defaults to the sender account when `--to` is omitted.
 - `npm run santa:resolve`: explicitly resolve an uncertain delivery.
+- `npm run santa:archive:export`: decrypt the Actions archive into `.private/exports/` locally.
+  Use `--archive .private/campaign.enc.json` for a local campaign.
 
 See the README for configuration and exact options.
 

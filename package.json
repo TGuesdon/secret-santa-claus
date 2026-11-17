@@ -23,6 +23,7 @@
     "santa:check": "tsx --env-file-if-exists=.env scripts/cli.ts check",
     "santa:mail": "tsx --env-file-if-exists=.env scripts/cli.ts mail",
     "santa:mail:test": "tsx --env-file-if-exists=.env scripts/test-mail.ts",
+    "santa:archive:export": "tsx --env-file-if-exists=.env scripts/export-archive.ts",
     "santa:resolve": "tsx --env-file-if-exists=.env scripts/cli.ts resolve",
     "santa:key": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('base64url'))\""
   },

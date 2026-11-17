@@ -43,6 +43,39 @@ async function setup() {
   return { cwd, env, run };
 }
 
+it('exports a decrypted archive privately without changing campaign files or logging links', async () => {
+  const { cwd, env, run } = await setup();
+
+  await run('prepare', '--id', 'export-test', '--participants', 'participants.json');
+  const archivePath = join(cwd, '.private/campaign.enc.json');
+  const archiveBefore = await readFile(archivePath, 'utf8');
+  const drawBefore = await readFile(join(cwd, 'public/draws.json'), 'utf8');
+  const exportScript = resolve('scripts/export-archive.ts');
+  const exportArgs = ['--import', tsx, exportScript, '--archive', archivePath];
+  const output = await exec(process.execPath, exportArgs, { cwd, env });
+  const campaign = JSON.parse(
+    await readFile(join(cwd, '.private/exports/export-test.json'), 'utf8'),
+  );
+
+  expect(campaign.id).toBe('export-test');
+  expect(campaign.records).toHaveLength(2);
+  expect(campaign.records[0].url).toContain('#v1.');
+  expect(output.stdout).not.toContain(campaign.records[0].key);
+  expect(output.stdout).not.toContain(campaign.records[0].email);
+  expect(await readFile(archivePath, 'utf8')).toBe(archiveBefore);
+  expect(await readFile(join(cwd, 'public/draws.json'), 'utf8')).toBe(drawBefore);
+
+  await expect(
+    exec(process.execPath, exportArgs, {
+      cwd,
+      env: { ...env, SANTA_ARCHIVE_KEY: randomToken(32) },
+    }),
+  ).rejects.toMatchObject({ stderr: expect.stringContaining('Archive export failed.') });
+  expect(
+    JSON.parse(await readFile(join(cwd, '.private/exports/export-test.json'), 'utf8')),
+  ).toEqual(campaign);
+});
+
 it('generates demo links/QR and protects a production draw from the demo command', async () => {
   const { cwd, run } = await setup();
 

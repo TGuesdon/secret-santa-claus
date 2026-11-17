@@ -240,6 +240,17 @@ If deployment fails after the preparation commit, rerun **prepare** with the sam
 the exact saved JSON rather than drawing again. A normal frontend push also preserves that draw.
 Preparation deploys directly because [GITHUB_TOKEN pushes do not normally trigger push workflows](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
 
+### Complete campaign in one run
+
+Open **Actions → Secret Santa complete campaign → Run workflow** on the default
+branch. Enter the same campaign ID in `campaign` and `confirmation`. This authorizes
+real email delivery after preparation, simulation, CI and Pages deployment succeed.
+
+The workflow waits for the exact saved draw to appear on Pages before enabling
+Gmail. It uses the existing repository secrets and variables. Rerunning the same
+campaign resumes its saved state and skips confirmed deliveries; uncertain
+deliveries still require the separate **resolve** operation.
+
 Campaign operations and deployments share a concurrency group and do not cancel active sends.
 Deployment rejects a build that no longer matches the default branch. Avoid manually editing
 campaign state or starting unrelated repository changes while an operation is running.
@@ -272,6 +283,28 @@ npm run santa:resolve -- --confirm local-test --record OPAQUE_ID --status sent -
 Choose one outcome, not both. Local commands cannot change or send an Actions campaign.
 You may inspect an Actions archive locally using `santa:check` or a mail dry-run after pulling
 the latest branch and providing its archive key. Real plaintext previews remain ignored.
+
+### Decrypt an archive locally
+
+With the matching `SANTA_ARCHIVE_KEY` in `.env`, export the Actions archive:
+
+```sh
+npm run santa:archive:export
+```
+
+The default input is `state/campaign.enc.json`. Output is written to
+`.private/exports/<campaign>.json`, such as `.private/exports/test-gh.json`.
+`records[].id` contains participant IDs and `records[].url` contains personal links.
+The full plaintext also contains emails, individual keys, assignments and statuses;
+keep it private. The encrypted archive and public draw are unchanged.
+
+For a local archive:
+
+```sh
+npm run santa:archive:export -- --archive .private/campaign.enc.json
+```
+
+Export is local only, does not send mail and never prints private records to stdout.
 
 ## Security boundary and troubleshooting
 
