@@ -61,7 +61,16 @@ function readRecord(value: unknown): DeliveryRecord {
     throw new Error('A confirmed delivery must have an email Message-ID.');
   }
 
+  const exclusions = value.exclusions;
+
+  if (exclusions !== undefined) {
+    if (!Array.isArray(exclusions) || exclusions.some((name) => typeof name !== 'string')) {
+      throw new Error('Invalid archived participant exclusions.');
+    }
+  }
+
   return {
+    ...(exclusions !== undefined ? { exclusions: exclusions as string[] } : {}),
     name: stringField(value, 'name'),
     email: stringField(value, 'email'),
     id: stringField(value, 'id'),
@@ -80,8 +89,9 @@ export function validateCampaign(value: unknown): Campaign {
     throw new Error('Missing campaign delivery records.');
   }
 
-  const records = value.records.map(readRecord);
-  const participants = validateParticipants(records);
+  const savedRecords = value.records.map(readRecord);
+  const participants = validateParticipants(savedRecords);
+  const records = savedRecords.map((record, index) => ({ ...record, ...participants[index] }));
   const names = new Set(participants.map((participant) => participant.name));
   const publicDraw = validateDraw(JSON.parse(header.publicJson));
   const ids = new Set<string>();
@@ -93,7 +103,9 @@ export function validateCampaign(value: unknown): Campaign {
     const duplicate =
       ids.has(record.id) || keys.has(record.key) || recipients.has(record.recipientName);
 
-    if (!validRecipient || duplicate) {
+    const excludedRecipient = record.exclusions?.includes(record.recipientName) ?? false;
+
+    if (!validRecipient || duplicate || excludedRecipient) {
       throw new Error('Invalid or duplicate campaign assignment.');
     }
 

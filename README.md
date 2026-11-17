@@ -100,8 +100,8 @@ TypeScript is pinned to the 6.0 release line supported by the installed TypeScri
 
 ## How it works
 
-1. An explicit command validates participants and generates a cryptographically random
-   permutation in which nobody draws themselves and everyone receives one gift.
+1. An explicit command validates participants and exclusions, then generates a randomized
+   assignment in which nobody draws themselves and everyone receives one gift.
 2. Each participant receives an independent random AES-256-GCM key and opaque ID.
 3. `public/campaigns/<id>/draws.json` stores encrypted individual entries with fresh 96-bit IVs and authentication tags.
 4. A personal URL contains `?campaign=<id>#v1.ID.KEY`. Its secret fragment is not sent in HTTP requests.
@@ -149,8 +149,10 @@ Set the single Actions secret `SANTA_PARTICIPANTS_JSON` to an object such as thi
 ```json
 {
   "family-2026": [
-    { "name": "Alice", "email": "alice@example.com" },
-    { "name": "Bob", "email": "bob@example.com" }
+    { "name": "Alice", "email": "alice@example.com", "exclusions": ["Michel"] },
+    { "name": "Bob", "email": "bob@example.com" },
+    { "name": "Stan", "email": "stan@example.com" },
+    { "name": "Michel", "email": "michel@example.com" }
   ],
   "friends-2026": [
     { "name": "Charlie", "email": "charlie@example.com" },
@@ -162,6 +164,22 @@ Set the single Actions secret `SANTA_PARTICIPANTS_JSON` to an object such as thi
 The workflow's `campaign` input selects its list. A missing entry fails before generation.
 Local `--participants` files still contain one participant array. Repeating preparation resumes
 saved assignments; changing the secret does not redraw an existing campaign.
+
+Each participant can optionally provide `"exclusions": ["Michel"]` to forbid specific
+recipients. In the example, Alice may draw Bob or Stan, but never Michel or herself.
+Exclusions are directional: Michel may still draw Alice. Add Alice to Michel's exclusions
+as well if the restriction should work both ways. Omitting `exclusions` or using `[]`
+allows every other participant.
+
+Exclusions reference names in the same campaign. Matching ignores surrounding whitespace,
+letter case and Unicode normalization differences. Unknown names, duplicate exclusions,
+self exclusions and malformed lists are rejected. A randomized matching algorithm assigns
+each person exactly one eligible recipient and each recipient exactly one giver; it fails
+before saving a draw if no complete assignment exists. Random choices use Node's
+cryptographic generator; valid assignments are not guaranteed to be equally likely.
+Exclusions remain in the encrypted archive and are checked when it is recovered; they are
+never included in the public draw. Changing exclusions does not redraw a saved campaign:
+use a new campaign ID for a new draw.
 
 | Data                       | Path                                           |
 | -------------------------- | ---------------------------------------------- |

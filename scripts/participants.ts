@@ -3,6 +3,7 @@ import { isObject } from '../src/lib/draw-loader';
 export type Participant = {
   name: string;
   email: string;
+  exclusions?: string[];
 };
 
 export function validateName(name: string): void {
@@ -57,6 +58,45 @@ export function validateParticipants(value: unknown): Participant[] {
     names.add(normalizedName);
     emails.add(normalizedEmail);
     participants.push({ name, email });
+  }
+
+  const participantsByName = new Map(
+    participants.map((participant) => [participant.name.toLocaleLowerCase('fr'), participant]),
+  );
+
+  for (const [index, participant] of participants.entries()) {
+    const exclusions: unknown = value[index].exclusions;
+
+    if (exclusions === undefined) {
+      continue;
+    }
+
+    if (!Array.isArray(exclusions)) {
+      throw new Error('Participant exclusions must be an array of names.');
+    }
+
+    const excludedNames = new Set<string>();
+
+    for (const exclusion of exclusions) {
+      if (typeof exclusion !== 'string') {
+        throw new Error('Participant exclusions must contain names.');
+      }
+
+      const normalizedName = exclusion.trim().normalize('NFC').toLocaleLowerCase('fr');
+      const excludedParticipant = participantsByName.get(normalizedName);
+
+      if (!excludedParticipant || excludedParticipant === participant) {
+        throw new Error('An exclusion must name another participant in this campaign.');
+      }
+
+      if (excludedNames.has(excludedParticipant.name)) {
+        throw new Error('Duplicate participant exclusion.');
+      }
+
+      excludedNames.add(excludedParticipant.name);
+    }
+
+    participant.exclusions = [...excludedNames];
   }
 
   return participants;

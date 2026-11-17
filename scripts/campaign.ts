@@ -1,4 +1,5 @@
-import { createHash, randomInt } from 'node:crypto';
+import { drawRecipients } from './assignments';
+import { createHash } from 'node:crypto';
 import { encrypt, randomToken } from '../src/lib/crypto';
 import { buildLink, validateBaseUrl, validateCampaignId } from '../src/lib/link';
 import type { PublicDraw } from '../src/lib/draw-loader';
@@ -36,23 +37,6 @@ export function hashText(value: string): string {
   return createHash('sha256').update(value).digest('hex');
 }
 
-function drawRecipients(participants: Participant[]): Participant[] {
-  let recipients: Participant[];
-
-  // Fisher–Yates followed by rejection of permutations containing self-assignments.
-  do {
-    recipients = [...participants];
-
-    for (let i = recipients.length - 1; i > 0; i--) {
-      const j = randomInt(i + 1);
-
-      [recipients[i], recipients[j]] = [recipients[j], recipients[i]];
-    }
-  } while (recipients.some((recipient, index) => recipient.name === participants[index].name));
-
-  return recipients;
-}
-
 export async function createCampaign(
   input: unknown,
   options: CampaignOptions,
@@ -77,6 +61,10 @@ export async function createCampaign(
     const id = identity?.id ?? randomToken(16);
     const key = identity?.key ?? randomToken(32);
     const recipientName = identity?.recipientName ?? recipients[index].name;
+
+    if (participant.exclusions?.includes(recipientName) || participant.name === recipientName) {
+      throw new Error('Invalid campaign assignment.');
+    }
 
     if (Object.hasOwn(publicDraw.entries, id)) {
       throw new Error('Duplicate opaque identifier.');
