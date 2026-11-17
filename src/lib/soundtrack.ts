@@ -1,3 +1,5 @@
+import { IntroLoop } from './intro-loop';
+
 export const DROP_SECONDS = 6.5;
 const MUSIC_VOLUME = 0.55;
 const FADE_MILLISECONDS = 450;
@@ -9,12 +11,14 @@ type Fade = {
   pauseAfter: boolean;
 };
 
+type Track = Pick<HTMLAudioElement, 'play' | 'pause' | 'volume'>;
+
 /** Owns playback and its clock; React only receives the musical drop. */
 export class Soundtrack {
-  private readonly intro = new Audio(`${import.meta.env.BASE_URL}intro_loop.mp3`);
+  private readonly intro = new IntroLoop(`${import.meta.env.BASE_URL}intro_loop.mp3`);
   private readonly jingle = new Audio(`${import.meta.env.BASE_URL}jingle_bell.mp3`);
-  private readonly fades = new Map<HTMLAudioElement, Fade>();
-  private active = this.intro;
+  private readonly fades = new Map<Track, Fade>();
+  private active: Track = this.intro;
   private timer: ReturnType<typeof setInterval> | undefined;
   private muted = false;
   private disposed = false;
@@ -25,11 +29,9 @@ export class Soundtrack {
   private lastPosition = 0;
 
   constructor(private readonly onPlaybackBlocked: () => void = () => {}) {
-    for (const track of [this.intro, this.jingle]) {
-      track.loop = true;
-      track.preload = 'none';
-      track.volume = 0;
-    }
+    this.jingle.loop = true;
+    this.jingle.preload = 'none';
+    this.jingle.volume = 0;
   }
 
   enter() {
@@ -79,7 +81,7 @@ export class Soundtrack {
     this.drop = undefined;
     clearInterval(this.timer);
     this.fades.clear();
-    this.intro.pause();
+    this.intro.dispose();
     this.jingle.pause();
   }
 
@@ -89,7 +91,7 @@ export class Soundtrack {
     }
   }
 
-  private play(track: HTMLAudioElement) {
+  private play(track: Track) {
     if (this.muted || this.disposed) {
       return;
     }
@@ -99,14 +101,19 @@ export class Soundtrack {
 
     // Call play directly from the click, before awaiting any network work.
     void track.play().catch(() => {
-      if (!this.disposed && track === this.active) {
+      if (!this.disposed && !this.muted && track === this.active) {
         this.playbackAvailable = false;
         this.onPlaybackBlocked();
       }
     });
   }
 
-  private fade(track: HTMLAudioElement, to: number, pauseAfter = false) {
+  private fade(track: Track, to: number, pauseAfter = false) {
+    if (track === this.intro && pauseAfter) {
+      // The intro may still be decoding when the user opens the letter.
+      this.intro.cancelPendingPlay();
+    }
+
     this.fades.set(track, {
       from: track.volume,
       to,

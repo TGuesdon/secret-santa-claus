@@ -181,13 +181,11 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
 
   let headingCopy: { heading: string; emphasis: string } = hasLink ? wording.ready : wording.link;
 
-  if (opening) {
-    headingCopy = wording.opening;
-  }
-
   if (revealed) {
     headingCopy = wording.revealed;
   }
+
+  const showLetterHeading = headingCopy === wording.ready;
 
   return (
     <div
@@ -246,15 +244,25 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
       <main className="experience" inert={curtainClosed}>
         <div className="heading-group" aria-hidden={curtainClosed || arriving || undefined}>
           <h2
-            className={headingCopy === wording.ready ? 'invitation-heading' : undefined}
+            className={showLetterHeading ? 'invitation-heading' : undefined}
             ref={stageHeading}
-            tabIndex={hasLink ? -1 : undefined}
+            tabIndex={hasLink && !opening ? -1 : undefined}
+            aria-hidden={opening || undefined}
           >
             {headingCopy.heading}
             <br />
             <em>{headingCopy.emphasis}</em>
           </h2>
-          {opening && <p className="scene-description">{wording.opening.description}</p>}
+          {showLetterHeading && (
+            <div aria-hidden={!opening || undefined}>
+              <h2>
+                {wording.opening.heading}
+                <br />
+                <em>{wording.opening.emphasis}</em>
+              </h2>
+              <p className="scene-description">{wording.opening.description}</p>
+            </div>
+          )}
         </div>
 
         <ChristmasScene

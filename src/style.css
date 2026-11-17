@@ -213,6 +213,14 @@ html {
 .heading-group {
   position: relative;
   z-index: 2;
+  display: grid;
+}
+/* Both headings size the same grid cell so the illustration stays anchored. */
+.heading-group > * {
+  grid-area: 1 / 1;
+}
+.heading-group > [aria-hidden='true'] {
+  visibility: hidden;
 }
 .heading-group h2 {
   margin: 0;
@@ -224,6 +232,7 @@ html {
   text-shadow: 0 4px 3px #102b60;
 }
 .heading-group .invitation-heading {
+  align-self: end;
   font-size: clamp(36px, 4.5vw, 64px);
 }
 .heading-group em {
@@ -236,7 +245,7 @@ html {
   color: #e2ecff;
 }
 
-/* The whole picture moves together; the gift has its own reveal choreography. */
+/* The illustration anchors the letter's choreography. */
 .christmas-scene {
   position: relative;
   width: min(100%, 1000px);

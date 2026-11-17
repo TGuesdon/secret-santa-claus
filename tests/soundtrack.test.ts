@@ -38,6 +38,48 @@ it('requests audible intro autoplay instead of starting silently and raising the
   soundtrack.dispose();
 });
 
+it('plays the decoded intro as one continuous loop and suspends it for the jingle', async () => {
+  const buffer = {} as AudioBuffer;
+  const source = { buffer: null, loop: false, connect: vi.fn(), start: vi.fn() };
+  const gain = { gain: { value: 0 }, connect: vi.fn() };
+  const context = {
+    resume: vi.fn(async () => {}),
+    suspend: vi.fn(async () => {}),
+    close: vi.fn(async () => {}),
+    decodeAudioData: vi.fn(async () => buffer),
+    createGain: vi.fn(() => gain),
+    createBufferSource: vi.fn(() => source),
+  };
+  const fetchIntro = vi.fn(async () => new Response(new Uint8Array([1, 2, 3])));
+
+  vi.stubGlobal('AudioContext', function () {
+    return context;
+  });
+  vi.stubGlobal('fetch', fetchIntro);
+  const soundtrack = new Soundtrack();
+
+  expect(fetchIntro).not.toHaveBeenCalled();
+  soundtrack.enter();
+  expect(context.resume).toHaveBeenCalledOnce();
+  await vi.advanceTimersByTimeAsync(0);
+
+  expect(fetchIntro).toHaveBeenCalledOnce();
+  expect(source.buffer).toBe(buffer);
+  expect(source.loop).toBe(true);
+  expect(source.start).toHaveBeenCalledOnce();
+  expect(gain.gain.value).toBe(0.55);
+  expect(tracks[0].play).not.toHaveBeenCalled();
+
+  soundtrack.reveal(vi.fn());
+  await vi.advanceTimersByTimeAsync(450);
+  expect(tracks[1].play).toHaveBeenCalledOnce();
+  expect(gain.gain.value).toBe(0);
+  expect(context.suspend).toHaveBeenCalledOnce();
+
+  soundtrack.dispose();
+  expect(context.close).toHaveBeenCalledOnce();
+});
+
 it('reports denied audible autoplay and retries on one explicit activation', async () => {
   const onBlocked = vi.fn();
   const soundtrack = new Soundtrack(onBlocked);
