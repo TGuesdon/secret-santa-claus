@@ -174,3 +174,19 @@ it('verifies every campaign draw and rejects missing, changed or unexpected camp
   await atomicWrite(join(root, 'campaigns/extra/draws.json'), json);
   await expect(inspectDist(root, expected, {})).rejects.toThrow();
 });
+
+it('allows the config entry while rejecting extra files and secrets in that directory', async () => {
+  const root = await directory();
+  const json = '{"version":1,"entries":{}}\n';
+
+  await atomicWrite(join(root, 'draws.json'), json);
+  await atomicWrite(join(root, 'config/index.html'), '<title>Secret Santa</title>');
+  await expect(inspectDist(root, { 'draws.json': json }, {})).resolves.toBeUndefined();
+  await atomicWrite(join(root, 'config/participants.json'), 'private');
+  await expect(inspectDist(root, { 'draws.json': json }, {})).rejects.toThrow();
+  await rm(join(root, 'config/participants.json'));
+  await atomicWrite(join(root, 'config/index.html'), 'private-archive-key');
+  await expect(
+    inspectDist(root, { 'draws.json': json }, { SANTA_ARCHIVE_KEY: 'private-archive-key' }),
+  ).rejects.toThrow(/Private/);
+});

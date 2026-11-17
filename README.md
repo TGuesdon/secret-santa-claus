@@ -137,6 +137,33 @@ public demo keys, this key must never be committed. It is needed to recover or r
 The base URL must use HTTPS, except for loopback local testing, and have no credentials,
 query or fragment. Participant names and email addresses must be unique after normalization.
 
+## Configuration editor
+
+Open `/config/` on the site (for example `http://localhost:5173/config/` during
+local development). On GitHub Pages, use the repository prefix:
+`https://<owner>.github.io/<repository>/config/`. This is a separate static entry;
+direct access and refresh do not require a server-side router.
+
+The editor uses the existing Christmas colors and typography with a quieter layout.
+Create multiple campaigns, add participants and choose directed exclusions from a dropdown.
+Names, email syntax, duplicates, campaign IDs, exclusion references and full assignment
+feasibility use the same domain rules as the CLI. Email validation checks syntax, not
+whether the mailbox exists. Renaming or removing a participant updates exclusion references.
+
+Import a JSON file or paste either the Actions campaign dictionary or one local participant
+array. A local array receives the editable ID `campaign`. Imports must be valid and feasible;
+review the confirmation before replacing your current edits. Unknown participant fields
+are rejected to prevent accidentally dropping a misspelled exclusion rule.
+
+Use **Vérifier et générer le JSON**, then the copy-icon button or **Télécharger le JSON**.
+The output is the campaign dictionary expected by `SANTA_PARTICIPANTS_JSON`. To use one
+campaign in a local `--participants` file, take that campaign's participant array.
+Editing the configuration invalidates the previous generated JSON until validation runs again.
+
+All entered data stays in this tab's memory: there is no automatic save, server request,
+actual draw or email delivery. Export before leaving; the browser warns about unexported
+changes. The editor does not read or update existing repository campaigns or GitHub secrets.
+
 ## Simultaneous campaigns
 
 The same repository and Pages site can host family, friends and later years simultaneously.

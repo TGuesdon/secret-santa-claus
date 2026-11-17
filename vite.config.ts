@@ -11,6 +11,14 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     base: env.PUBLIC_BASE_URL ? new URL(env.PUBLIC_BASE_URL).pathname : '/',
+    build: {
+      rolldownOptions: {
+        input: {
+          main: fileURLToPath(new URL('./index.html', import.meta.url)),
+          config: fileURLToPath(new URL('./config/index.html', import.meta.url)),
+        },
+      },
+    },
     test: { root: projectRoot, environment: 'node', restoreMocks: true },
   };
 });

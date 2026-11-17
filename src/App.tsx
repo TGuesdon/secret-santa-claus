@@ -1,3 +1,5 @@
+import { Brand } from './components/Brand';
+import { Button } from './components/Button';
 import { wording } from './locales/fr';
 import { DrawError } from './lib/draw-error';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
@@ -181,15 +183,7 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
       <Snow />
       <FestiveBackdrop />
       <header className="site-header">
-        <h1 className="brand">
-          <Icon name="gift" />
-          <span>
-            {wording.brand}
-            <span className="brand-dot" aria-hidden="true">
-              .
-            </span>
-          </span>
-        </h1>
+        <Brand />
         <div className="experience-controls">
           <button
             className="quiet-button"
@@ -256,10 +250,10 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
           )}
           {hasLink && !revealed && (
             <>
-              <button className="primary-button" onClick={reveal} disabled={opening}>
+              <Button variant="primary" onClick={reveal} disabled={opening}>
                 {opening ? wording.opening.action : wording.ready.action}
                 {!opening && <Icon name="gift" />}
-              </button>
+              </Button>
               <p className="action-note">{opening ? wording.opening.note : wording.ready.note}</p>
             </>
           )}

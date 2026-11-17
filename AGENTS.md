@@ -11,7 +11,9 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
 ## Repository map
 
 - `src/`: React UI and shared browser-compatible encryption, links and draw loading.
-- `src/components/`: decorative Christmas scene and small SVG icons.
+- `src/config/`: static `/config/` editor for campaign JSON, import and export.
+- `src/components/`: shared brand/buttons/form fields, decorative Christmas scene and SVG icons.
+- `src/lib/participants.ts` and `assignment.ts`: shared CLI/browser validation and matching.
 - `src/lib/soundtrack.ts`: intro/jingle playback, drop timing, fades and silent fallback.
 - `src/assets/`: self-hosted display font and original Christmas illustration.
 - `PRODUCT.md` and `DESIGN.md`: product constraints and the visual system.

@@ -1,3 +1,4 @@
+import { ValidationError } from './validation-error';
 import { decode } from './crypto';
 
 export function parseLink(fragment: string): { id: string; key: string } {
@@ -31,7 +32,7 @@ export function validateBaseUrl(value: string): string {
 
 export function validateCampaignId(id: string): string {
   if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(id)) {
-    throw new Error('Invalid campaign identifier.');
+    throw new ValidationError('invalid-campaign-id');
   }
 
   return id;
@@ -54,7 +55,7 @@ export function campaignFromSearch(search: string): string | undefined {
   }
 
   if (campaigns.length !== 1) {
-    throw new Error('Invalid campaign identifier.');
+    throw new ValidationError('invalid-campaign-id');
   }
 
   return validateCampaignId(campaigns[0]);

@@ -1,0 +1,718 @@
+.config-app {
+  --config-surface: var(--control-surface);
+  --config-field: #102653;
+  --config-border: var(--control-border);
+  --config-divider: #41699e;
+  min-height: 100svh;
+  color-scheme: dark;
+  accent-color: var(--gold);
+  caret-color: var(--gold);
+}
+
+.config-header,
+.config-main,
+.config-footer {
+  width: min(100%, 1280px);
+  margin-inline: auto;
+  padding-inline: 48px;
+}
+
+.config-header {
+  padding-block: 30px;
+}
+
+.brand-link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.config-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.config-back:hover {
+  color: var(--gold);
+}
+
+.config-back .icon {
+  width: 18px;
+}
+
+.config-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 275px;
+  align-items: end;
+  gap: 64px;
+  padding-block: 28px 32px;
+}
+
+.config-intro h1 {
+  margin: 0;
+  font:
+    500 clamp(36px, 4vw, 56px)/1.08 Fredoka,
+    sans-serif;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.config-intro em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.config-intro p {
+  max-width: 57ch;
+  margin: 18px 0 0;
+  color: var(--muted);
+}
+
+.config-privacy {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding-bottom: 4px;
+}
+
+.config-privacy > .icon {
+  width: 22px;
+  color: var(--gold);
+}
+
+.config-privacy p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.config-privacy strong {
+  font-weight: 400;
+}
+
+.config-workspace {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 32px;
+  align-items: start;
+}
+
+.campaign-sidebar {
+  padding-top: 8px;
+}
+
+.campaign-sidebar h2 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 20px;
+  font:
+    500 23px/1.2 Fredoka,
+    sans-serif;
+}
+
+.campaign-count {
+  color: var(--gold);
+  font:
+    400 16px/1.5 'Trebuchet MS',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.campaign-sidebar nav {
+  display: grid;
+  gap: 8px;
+}
+
+.campaign-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 14px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--text);
+  background: transparent;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.campaign-choice[aria-current='page'] {
+  border-color: var(--gold);
+  background: var(--control-hover);
+}
+
+.campaign-choice:hover {
+  background: var(--control-hover);
+}
+
+.campaign-choice .icon {
+  width: 20px;
+  color: var(--gold);
+}
+
+.campaign-choice strong,
+.campaign-choice small {
+  display: block;
+}
+
+.campaign-choice strong {
+  font-size: 15px;
+}
+
+.campaign-choice small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.config-app .quiet-button {
+  min-height: 44px;
+  font-size: 14px;
+}
+
+.config-app .quiet-button .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.add-campaign {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.campaign-content,
+.campaign-content form {
+  min-width: 0;
+}
+
+.campaign-editor {
+  padding: 28px;
+  border: 1px solid var(--config-divider);
+  border-radius: 14px;
+  background: var(--config-surface);
+}
+
+.campaign-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.campaign-topline h2 {
+  margin: 0;
+  font:
+    500 28px/1.2 Fredoka,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.config-app .icon-button {
+  flex-shrink: 0;
+  padding: 10px;
+  min-width: 44px;
+}
+
+.form-field,
+.exclusion-select {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
+}
+
+.config-app label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.config-app input:not([type='file']),
+.config-app select,
+.config-app textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 11px 12px;
+  border: 1px solid var(--config-border);
+  border-radius: 14px;
+  background: var(--config-field);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.config-app input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.config-app select {
+  padding-inline-end: 28px;
+}
+
+.config-app select:disabled {
+  color: var(--muted);
+  border-color: var(--config-divider);
+  opacity: 0.8;
+}
+
+.config-app textarea {
+  display: block;
+  resize: vertical;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+.config-app :is(input, select, textarea, a, summary):focus-visible,
+.validation-summary:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.config-app [aria-invalid='true'] {
+  border-color: var(--gold);
+}
+
+.field-hint,
+.field-error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.field-hint {
+  max-width: 65ch;
+  margin-bottom: 4px;
+  color: var(--muted);
+}
+
+.field-error {
+  color: var(--gold);
+}
+
+.participants-heading {
+  margin-top: 32px;
+}
+
+.participants-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font:
+    500 23px/1.2 Fredoka,
+    sans-serif;
+}
+
+.participants-heading h3 .icon {
+  width: 21px;
+  color: var(--gold);
+}
+
+.participants-heading p,
+.exclusion-guide {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
+.exclusion-guide {
+  margin-bottom: 28px;
+  max-width: 65ch;
+}
+
+.participant-editor {
+  min-width: 0;
+  margin: 0 0 28px;
+  padding: 0 0 28px;
+  border: 0;
+  border-bottom: 1px solid var(--config-divider);
+}
+
+.participant-editor legend {
+  margin-bottom: 12px;
+  padding: 0;
+  color: var(--gold);
+  font:
+    500 20px/1.3 Fredoka,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.participant-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) 44px;
+  align-items: start;
+  gap: 16px;
+}
+
+.remove-person {
+  margin-top: 27px;
+}
+
+.exclusion-editor {
+  display: flex;
+  gap: 12px 20px;
+  align-items: end;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.exclusion-select {
+  width: min(100%, 268px);
+}
+
+.exclusion-select label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.exclusion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-width: 100%;
+}
+
+.config-app .exclusion-chip {
+  padding: 8px 12px;
+  background: var(--control-hover);
+  border-color: var(--control-border);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.exclusion-chip .icon {
+  flex-shrink: 0;
+}
+
+.exclusion-empty {
+  flex: 1;
+  min-width: 160px;
+  margin: 0 0 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.config-app .add-person {
+  min-height: 48px;
+  padding-inline: 18px;
+}
+
+.import-panel {
+  border-block: 1px solid var(--config-divider);
+}
+
+.import-panel summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: fit-content;
+  min-height: 56px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.import-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.import-panel summary .icon {
+  width: 18px;
+  color: var(--gold);
+}
+
+.import-panel summary::after {
+  content: '';
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  width: 7px;
+  height: 7px;
+  margin-inline-start: 8px;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.import-panel[open] summary::after {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.import-content {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 24px;
+  max-width: 800px;
+}
+
+.import-content > p,
+.import-confirmation p,
+.delete-confirmation p {
+  margin: 0 0 6px;
+  color: var(--muted);
+  max-width: 65ch;
+  font-size: 14px;
+}
+
+.import-content > .quiet-button {
+  justify-self: start;
+}
+
+.config-app input[type='file'] {
+  max-width: 100%;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+}
+
+.config-app ::file-selector-button {
+  min-height: 44px;
+  padding: 8px 12px;
+  margin-inline-end: 12px;
+  background: var(--config-field);
+  border: 1px solid var(--config-border);
+  border-radius: 14px;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.delete-confirmation {
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+}
+
+.validation-summary {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  color: var(--gold);
+}
+
+.validation-summary h2 {
+  margin: 0 0 8px;
+  font:
+    500 22px/1.2 Fredoka,
+    sans-serif;
+}
+
+.validation-summary p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.export-panel {
+  margin-top: 32px;
+}
+
+.export-introduction h2 {
+  margin: 0;
+  font:
+    500 26px/1.2 Fredoka,
+    sans-serif;
+}
+
+.export-introduction p {
+  margin: 10px 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 65ch;
+}
+
+.config-app .primary-button {
+  font-size: 18px;
+  min-height: 52px;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.config-app .primary-button .icon {
+  width: 20px;
+}
+
+.json-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+#configuration-output {
+  max-height: 480px;
+}
+
+.export-feedback {
+  min-height: 24px;
+  margin: 12px 0 0;
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.config-empty {
+  padding-block: 32px;
+  color: var(--muted);
+}
+
+.config-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-block: 56px 32px;
+}
+
+.config-footer .brand {
+  font-size: 19px;
+}
+
+.config-footer .brand .icon {
+  width: 22px;
+}
+
+.config-footer p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .config-intro {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .config-privacy {
+    max-width: 65ch;
+  }
+
+  .config-workspace {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .campaign-sidebar nav {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .add-campaign {
+    width: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .config-header,
+  .config-main,
+  .config-footer {
+    padding-inline: 20px;
+  }
+
+  .config-header {
+    align-items: center;
+    gap: 16px;
+    padding-block: 20px;
+  }
+
+  .config-header .brand {
+    padding: 0;
+    font-size: 21px;
+  }
+
+  .config-back {
+    max-width: 110px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .config-back .icon {
+    width: 15px;
+  }
+
+  .config-intro {
+    padding-block: 20px 28px;
+  }
+
+  .config-intro h1 {
+    font-size: clamp(32px, 8.5vw, 44px);
+  }
+
+  .config-intro > div > p {
+    font-size: 14px;
+  }
+
+  .campaign-editor {
+    padding: 20px 16px;
+  }
+
+  .participant-fields {
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 12px;
+  }
+
+  .participant-fields .form-field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .remove-person {
+    margin-top: 27px;
+  }
+
+  .exclusion-select {
+    width: 100%;
+  }
+
+  .exclusion-empty {
+    margin: 0;
+  }
+
+  .config-app .primary-button {
+    width: 100%;
+    max-width: none;
+    font-size: 17px;
+  }
+
+  .config-footer {
+    align-items: start;
+    padding-top: 40px;
+  }
+
+  .config-footer p {
+    margin: 0;
+    max-width: 135px;
+    text-align: end;
+  }
+}
+
+@media (forced-colors: active) {
+  .config-app :is(input, select, textarea, .campaign-editor, .campaign-choice) {
+    border-color: CanvasText;
+  }
+
+  .campaign-choice[aria-current='page'] {
+    border: 2px solid Highlight;
+  }
+}

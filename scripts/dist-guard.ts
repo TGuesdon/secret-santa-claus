@@ -8,7 +8,7 @@ export async function inspectDist(
   expectedDraws: Record<string, string>,
   env: NodeJS.ProcessEnv,
 ): Promise<void> {
-  const allowedDirectories = new Set(['assets']);
+  const allowedDirectories = new Set(['assets', 'config']);
 
   for (const [relative, expectedDraw] of Object.entries(expectedDraws)) {
     if (relative !== 'draws.json') {
@@ -70,7 +70,13 @@ export async function inspectDist(
       // Allow new asset categories explicitly to keep private files out of the site.
       if (
         !Object.hasOwn(expectedDraws, relative) &&
-        !['index.html', 'favicon.ico', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(relative) &&
+        ![
+          'index.html',
+          'config/index.html',
+          'favicon.ico',
+          'jingle_bell.mp3',
+          'intro_loop.mp3',
+        ].includes(relative) &&
         !/^assets\/[\w-]+\.(js|css|webp|ttf)$/.test(relative)
       ) {
         throw new Error('Unexpected file in the build.');

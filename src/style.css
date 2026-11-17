@@ -1,4 +1,4 @@
-﻿@font-face {
+@font-face {
   font-family: Fredoka;
   src: url('./assets/fredoka.ttf') format('truetype');
   font-style: normal;
@@ -19,6 +19,9 @@
   --night: #173b78;
   --text: #fff8e9;
   --muted: #d7e5ff;
+  --control-surface: #183366;
+  --control-border: #6c93cf;
+  --control-hover: #234e91;
 }
 
 * {
@@ -169,9 +172,9 @@ html {
   gap: 8px;
   min-height: 44px;
   padding: 9px 14px;
-  border: 1px solid #6c93cf;
+  border: 1px solid var(--control-border);
   border-radius: 24px;
-  background: #183366;
+  background: var(--control-surface);
   color: var(--text);
   font-size: 13px;
   transition:
@@ -179,7 +182,7 @@ html {
     border-color 160ms;
 }
 .quiet-button:hover {
-  background: #234e91;
+  background: var(--control-hover);
   border-color: #a9c9ff;
 }
 .quiet-button .icon {

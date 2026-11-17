@@ -1,9 +1,37 @@
-﻿import type { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-type IconName = 'gift' | 'sound' | 'muted' | 'pause' | 'play' | 'arrow' | 'star';
+type IconName =
+  | 'gift'
+  | 'sound'
+  | 'muted'
+  | 'pause'
+  | 'play'
+  | 'arrow'
+  | 'star'
+  | 'plus'
+  | 'trash'
+  | 'close'
+  | 'check'
+  | 'copy'
+  | 'download'
+  | 'upload'
+  | 'people';
 
 export function Icon({ name, className = '' }: { name: IconName; className?: string }) {
   const paths: Record<IconName, ReactNode> = {
+    plus: <path d="M12 5v14M5 12h14" />,
+    trash: <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" />,
+    close: <path d="m6 6 12 12M18 6 6 18" />,
+    check: <path d="m5 12 4 4L19 6" />,
+    copy: <path d="M9 9h12v12H9zM15 9V3H3v12h6" />,
+    download: <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />,
+    upload: <path d="M12 16V4m-5 5 5-5 5 5M4 16v5h16v-5" />,
+    people: (
+      <>
+        <circle cx="9" cy="7" r="3" />
+        <path d="M3 21v-3a6 6 0 0 1 12 0v3M17 4a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 5v2" />
+      </>
+    ),
     gift: (
       <>
         <path d="M3 10h18v4H3zM5 14v8h14v-8M12 10v12" />
