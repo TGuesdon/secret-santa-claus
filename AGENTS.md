@@ -17,8 +17,9 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
 - `PRODUCT.md` and `DESIGN.md`: product constraints and the visual system.
 - `scripts/`: campaigns, encrypted archives, private files, SMTP email delivery and CLI.
 - `fixtures/demo.json`: four fictional participants with intentionally public test keys.
-- `public/draws.json`: the only published data file; encrypted individual results only.
-- `state/campaign.enc.json`: encrypted archive for the GitHub Actions campaign.
+- `public/draws.json`: fictional demo encrypted draw.
+- `public/campaigns/<id>/draws.json`: encrypted production results selected by `?campaign=<id>`.
+- `state/campaigns/<id>/campaign.enc.json`: encrypted archives for GitHub Actions campaigns.
 - `.private/`: ignored local private files, never published or uploaded as artifacts.
 - `.github/workflows/`: CI, deployment and manually triggered campaign operations.
 - `tests/`: crypto, assignment, delivery, recovery, CLI and UI tests.
@@ -60,13 +61,13 @@ unpacked before a maintainer can understand it.
 - `npm run lint:fix` and `npm run format`: automatic fixes.
 - `npm run santa:demo`: generate four demo links and QR codes.
 - `npm run santa:prepare -- --id <campaign>`: prepare or resume a campaign.
-- `npm run santa:check`: verify the archive and public JSON.
-- `npm run santa:mail`: dry-run; actual delivery requires `--send --confirm <campaign>`.
+- `npm run santa:check -- --id <campaign>`: verify the archive and public JSON.
+- `npm run santa:mail -- --id <campaign>`: dry-run; actual delivery requires `--send --confirm <campaign>`.
 - `npm run santa:mail:test -- --to <email>`: explicitly send one real SMTP test email;
   the recipient defaults to the sender account when `--to` is omitted.
-- `npm run santa:resolve`: explicitly resolve an uncertain delivery.
-- `npm run santa:archive:export`: decrypt the Actions archive into `.private/exports/` locally.
-  Use `--archive .private/campaign.enc.json` for a local campaign.
+- `npm run santa:resolve -- --id <campaign>`: explicitly resolve an uncertain delivery.
+- `npm run santa:archive:export -- --id <campaign>`: decrypt the Actions archive into `.private/campaigns/<id>/export.json` locally.
+  Use `--archive .private/campaigns/<id>/campaign.enc.json` for a local campaign.
 
 See the README for configuration and exact options.
 

@@ -1,16 +1,20 @@
-﻿import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ChristmasScene, Snow } from './components/ChristmasScene';
 import { FestiveBackdrop } from './components/FestiveBackdrop';
 import type { CSSProperties } from 'react';
 import { Icon } from './components/Icons';
 import { loadDraw, type Result } from './lib/draw-loader';
-import { parseLink } from './lib/link';
+import { parseLink, campaignFromSearch, drawPath } from './lib/link';
 import { DROP_SECONDS, Soundtrack } from './lib/soundtrack';
 
 function subscribeToLink(callback: () => void) {
   window.addEventListener('hashchange', callback);
+  window.addEventListener('popstate', callback);
 
-  return () => window.removeEventListener('hashchange', callback);
+  return () => {
+    window.removeEventListener('hashchange', callback);
+    window.removeEventListener('popstate', callback);
+  };
 }
 
 function subscribeToMotion(callback: () => void) {
@@ -44,7 +48,7 @@ function revealErrorMessage(error: unknown): string {
   }
 }
 
-function Experience({ fragment }: { fragment: string }) {
+function Experience({ fragment, search }: { fragment: string; search: string }) {
   const [state, setState] = useState<RevealState>({ status: 'ready' });
   const [muted, setMuted] = useState(false);
   const [soundBlocked, setSoundBlocked] = useState(false);
@@ -59,6 +63,13 @@ function Experience({ fragment }: { fragment: string }) {
   );
 
   let invalid = false;
+  let campaignId: string | undefined;
+
+  try {
+    campaignId = campaignFromSearch(search);
+  } catch {
+    invalid = true;
+  }
 
   if (fragment) {
     try {
@@ -121,7 +132,7 @@ function Experience({ fragment }: { fragment: string }) {
 
     try {
       const [result] = await Promise.all([
-        loadDraw(fragment, `${import.meta.env.BASE_URL}draws.json`),
+        loadDraw(fragment, `${import.meta.env.BASE_URL}${drawPath(campaignId)}`),
         musicalDrop,
       ]);
 
@@ -310,6 +321,12 @@ export default function App() {
     () => '',
   );
 
+  const search = useSyncExternalStore(
+    subscribeToLink,
+    () => window.location.search,
+    () => '',
+  );
+
   // A new invitation gets its own result, timers and playback lifetime.
-  return <Experience key={fragment} fragment={fragment} />;
+  return <Experience key={`${search}${fragment}`} fragment={fragment} search={search} />;
 }

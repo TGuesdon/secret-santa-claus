@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { drawPath } from '../src/lib/link';
 import { decode } from '../src/lib/crypto';
 import type { Campaign } from './campaign';
 import { archivePath, assertCurrentBranch, persistGit, saveCampaign } from './storage';
@@ -9,6 +10,7 @@ export type Workspace = {
   publicPath: string;
   archivePath: string;
   branch?: string;
+  campaignId?: string;
 };
 
 export function requiredEnv(name: string): string {
@@ -21,19 +23,24 @@ export function requiredEnv(name: string): string {
   return value;
 }
 
-export function createWorkspace(root: string): Workspace {
+export function createWorkspace(root: string, campaignId?: string): Workspace {
   const executor = process.env.GITHUB_ACTIONS === 'true' ? 'github-actions' : 'local';
 
   return {
     root,
     executor,
-    publicPath: join(root, 'public/draws.json'),
-    archivePath: archivePath(root, executor),
+    publicPath: join(root, 'public', drawPath(campaignId)),
+    archivePath: campaignId ? archivePath(root, executor, campaignId) : '',
+    campaignId,
     branch: process.env.SANTA_DEFAULT_BRANCH,
   };
 }
 
 export function validateWorkspace(workspace: Workspace): void {
+  if (!workspace.campaignId) {
+    throw new Error('Provide a campaign identifier with --id.');
+  }
+
   if (decode(requiredEnv('SANTA_ARCHIVE_KEY')).length !== 32) {
     throw new Error('The archive key must contain 32 random bytes in base64url.');
   }
@@ -58,11 +65,15 @@ export function checkpointGit(workspace: Workspace): void {
     throw new Error('Missing default branch configuration.');
   }
 
-  persistGit(workspace.root, workspace.branch);
+  if (!workspace.campaignId) {
+    throw new Error('Missing campaign identifier.');
+  }
+
+  persistGit(workspace.root, workspace.branch, workspace.campaignId);
 }
 
 export async function persistCampaign(workspace: Workspace, campaign: Campaign): Promise<void> {
-  if (campaign.executor !== workspace.executor) {
+  if (campaign.executor !== workspace.executor || campaign.id !== workspace.campaignId) {
     throw new Error('This executor cannot modify the saved campaign.');
   }
 

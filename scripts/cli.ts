@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   }
 
   const command = positionals[0];
-  const workspace = createWorkspace(process.cwd());
+  const workspace = createWorkspace(process.cwd(), command === 'demo' ? undefined : values.id);
   const options: CommandOptions = {
     id: values.id,
     participantFile: values.participants,

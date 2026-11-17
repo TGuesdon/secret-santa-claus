@@ -45,7 +45,7 @@ export async function publicIsDemo(workspace: Workspace): Promise<boolean> {
 }
 
 export async function exportPrivateFiles(workspace: Workspace, campaign: Campaign): Promise<void> {
-  const folder = campaign.mode === 'demo' ? 'demo' : 'production';
+  const folder = campaign.mode === 'demo' ? 'demo' : `campaigns/${campaign.id}`;
   const directory = join(workspace.root, '.private', folder);
   const qrDirectory = join(directory, 'qr');
 
@@ -67,15 +67,28 @@ export async function loadSavedCampaign(
   expectedId?: string,
 ): Promise<Campaign> {
   let selectedPath = workspace.archivePath;
+  let selectedExecutor = workspace.executor;
+
+  const otherExecutor = workspace.executor === 'local' ? 'github-actions' : 'local';
+  const otherPath = archivePath(workspace.root, otherExecutor, workspace.campaignId!);
+
+  if ((await exists(selectedPath)) && (await exists(otherPath))) {
+    throw new Error('Both executors have saved this campaign. Resolve the conflict first.');
+  }
 
   // Local inspection of an Actions archive is allowed; delivery still checks its executor.
   if (!(await exists(selectedPath)) && workspace.executor === 'local') {
-    selectedPath = archivePath(workspace.root, 'github-actions');
+    selectedPath = otherPath;
+    selectedExecutor = 'github-actions';
   }
 
   const campaign = await readCampaign(selectedPath, requiredEnv('SANTA_ARCHIVE_KEY'));
 
-  if (expectedId && expectedId !== campaign.id) {
+  if (campaign.executor !== selectedExecutor) {
+    throw new Error('The archive executor does not match its storage location.');
+  }
+
+  if (expectedId !== campaign.id) {
     throw new Error('The campaign identifier does not match the saved archive.');
   }
 

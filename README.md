@@ -17,7 +17,7 @@ npm ci
 npm run dev
 ```
 
-The local app reads the current `public/draws.json`. Open a personal link belonging to
+The local app selects `public/campaigns/<id>/draws.json` from `?campaign=<id>`. Queryless demo links read `public/draws.json`. Open a personal link belonging to
 that draw. The links below work when the public file contains the fictional demo.
 To generate that demo and create its four QR codes:
 
@@ -103,8 +103,8 @@ TypeScript is pinned to the 6.0 release line supported by the installed TypeScri
 1. An explicit command validates participants and generates a cryptographically random
    permutation in which nobody draws themselves and everyone receives one gift.
 2. Each participant receives an independent random AES-256-GCM key and opaque ID.
-3. `public/draws.json` stores encrypted individual entries with fresh 96-bit IVs and authentication tags.
-4. A personal URL contains `#v1.ID.KEY`. Its secret fragment is not sent in HTTP requests.
+3. `public/campaigns/<id>/draws.json` stores encrypted individual entries with fresh 96-bit IVs and authentication tags.
+4. A personal URL contains `?campaign=<id>#v1.ID.KEY`. Its secret fragment is not sent in HTTP requests.
 5. The browser loads the JSON and decrypts only that participant's result after a reveal click.
 6. Email contains the personal link and a matching CID-embedded QR image, with text and HTML alternatives.
 
@@ -127,7 +127,7 @@ public demo keys, this key must never be committed. It is needed to recover or r
 
 | Name                          | GitHub location | Used for                                                                         |
 | ----------------------------- | --------------- | -------------------------------------------------------------------------------- |
-| `SANTA_PARTICIPANTS_JSON`     | Secret          | Real participants: array of `{ "name": "...", "email": "..." }`                  |
+| `SANTA_PARTICIPANTS_JSON`     | Secret          | Object mapping campaign IDs to arrays of `{ "name": "...", "email": "..." }`     |
 | `SANTA_ARCHIVE_KEY`           | Secret          | 32-byte random base64url archive key                                             |
 | `GOOGLE_APPLICATION_PASSWORD` | Secret          | Gmail app password for SMTP authentication                                       |
 | `PUBLIC_BASE_URL`             | Variable        | Full site URL ending in `/`, e.g. `https://pjdevs.github.io/secret-santa-claus/` |
@@ -136,6 +136,47 @@ public demo keys, this key must never be committed. It is needed to recover or r
 
 The base URL must use HTTPS, except for loopback local testing, and have no credentials,
 query or fragment. Participant names and email addresses must be unique after normalization.
+
+## Simultaneous campaigns
+
+The same repository and Pages site can host family, friends and later years simultaneously.
+Each production command requires `--id <campaign>`. IDs use 1 to 64 lowercase ASCII letters,
+digits or hyphens, beginning with a letter or digit. IDs are public and should not contain
+private information. A personal URL looks like `https://example.com/santa/?campaign=family-2026#v1.ID.KEY`.
+
+Set the single Actions secret `SANTA_PARTICIPANTS_JSON` to an object such as this fictional example:
+
+```json
+{
+  "family-2026": [
+    { "name": "Alice", "email": "alice@example.com" },
+    { "name": "Bob", "email": "bob@example.com" }
+  ],
+  "friends-2026": [
+    { "name": "Charlie", "email": "charlie@example.com" },
+    { "name": "Diane", "email": "diane@example.com" }
+  ]
+}
+```
+
+The workflow's `campaign` input selects its list. A missing entry fails before generation.
+Local `--participants` files still contain one participant array. Repeating preparation resumes
+saved assignments; changing the secret does not redraw an existing campaign.
+
+| Data                       | Path                                           |
+| -------------------------- | ---------------------------------------------- |
+| Published encrypted draw   | `public/campaigns/<id>/draws.json`             |
+| Encrypted Actions archive  | `state/campaigns/<id>/campaign.enc.json`       |
+| Encrypted local archive    | `.private/campaigns/<id>/campaign.enc.json`    |
+| Private links and QR codes | `.private/campaigns/<id>/links.json` and `qr/` |
+| Private mail previews      | `.private/campaigns/<id>/emails/`              |
+| Decrypted local export     | `.private/campaigns/<id>/export.json`          |
+
+Local and Actions executors cannot own the same ID. Local commands may inspect an Actions
+archive, but cannot send or modify it. Operations remain serialized across all campaigns.
+
+This layout breaks compatibility with previous root production archives and links. There is
+no automatic migration; old archives are not resumed. Queryless links are reserved for the demo.
 
 ## Configure Gmail SMTP
 
@@ -168,7 +209,7 @@ The sender is always `SANTA_SENDER_EMAIL`. The recipient defaults to that same a
 
 ## Test a real campaign locally
 
-Use a **separate checkout** for live local testing. Do not replace the day-of Actions campaign.
+Use a dedicated campaign ID for live local testing, distinct from any Actions campaign.
 Use two or more real addresses you control; the demo addresses are fictional.
 
 Create `.private/participants.json`:
@@ -185,26 +226,27 @@ and your archive/sender configuration in `.env`, then run:
 
 ```sh
 npm run santa:prepare -- --id local-test --participants .private/participants.json
-npm run santa:check
-npm run santa:mail
+npm run santa:check -- --id local-test
+npm run santa:mail -- --id local-test
 npm run dev
 ```
 
-Preparation creates `.private/campaign.enc.json`, private links/QR in `.private/production/`
-and the encrypted `public/draws.json`. Dry-run writes `.eml` previews to `.private/emails/`
+Preparation creates `.private/campaigns/local-test/campaign.enc.json`, private links/QR in
+`.private/campaigns/local-test/` and the encrypted `public/campaigns/local-test/draws.json`.
+Dry-run writes `.eml` previews to `.private/campaigns/local-test/emails/`
 without requiring Gmail credentials or making Gmail calls. Open previews in an email client.
 
 With the dev server still running in another terminal, Gmail configured and previews checked:
 
 ```sh
-npm run santa:check -- --published
-npm run santa:mail -- --send --confirm local-test
+npm run santa:check -- --id local-test --published
+npm run santa:mail -- --id local-test --send --confirm local-test
 ```
 
 Actual delivery first verifies that the exact campaign JSON is available at its base URL.
 The local server must remain reachable when recipients open localhost links; such links are
 only suitable for your own-machine testing. Use an HTTPS test deployment for other devices.
-Repeating preparation with the same ID resumes the saved campaign. A different ID is refused.
+Repeating preparation with the same ID resumes the saved campaign. A different ID creates an independent campaign.
 
 ## Set up GitHub Pages
 
@@ -276,12 +318,12 @@ retry of an uncertain send.** Confirmed `sent` records are skipped on subsequent
 Equivalent local resolution:
 
 ```sh
-npm run santa:resolve -- --confirm local-test --record OPAQUE_ID --status pending
-npm run santa:resolve -- --confirm local-test --record OPAQUE_ID --status sent --message-id CONFIRMED_MESSAGE_ID
+npm run santa:resolve -- --id local-test --confirm local-test --record OPAQUE_ID --status pending
+npm run santa:resolve -- --id local-test --confirm local-test --record OPAQUE_ID --status sent --message-id CONFIRMED_MESSAGE_ID
 ```
 
 Choose one outcome, not both. Local commands cannot change or send an Actions campaign.
-You may inspect an Actions archive locally using `santa:check` or a mail dry-run after pulling
+You may inspect an Actions archive locally using `santa:check -- --id <campaign>` or `santa:mail -- --id <campaign>` after pulling
 the latest branch and providing its archive key. Real plaintext previews remain ignored.
 
 ### Decrypt an archive locally
@@ -289,11 +331,11 @@ the latest branch and providing its archive key. Real plaintext previews remain 
 With the matching `SANTA_ARCHIVE_KEY` in `.env`, export the Actions archive:
 
 ```sh
-npm run santa:archive:export
+npm run santa:archive:export -- --id family-2026
 ```
 
-The default input is `state/campaign.enc.json`. Output is written to
-`.private/exports/<campaign>.json`, such as `.private/exports/test-gh.json`.
+The ID selects `state/campaigns/<id>/campaign.enc.json`. Output is written to
+`.private/campaigns/<id>/export.json`.
 `records[].id` contains participant IDs and `records[].url` contains personal links.
 The full plaintext also contains emails, individual keys, assignments and statuses;
 keep it private. The encrypted archive and public draw are unchanged.
@@ -301,7 +343,7 @@ keep it private. The encrypted archive and public draw are unchanged.
 For a local archive:
 
 ```sh
-npm run santa:archive:export -- --archive .private/campaign.enc.json
+npm run santa:archive:export -- --archive .private/campaigns/local-test/campaign.enc.json
 ```
 
 Export is local only, does not send mail and never prints private records to stdout.
@@ -314,15 +356,13 @@ Export is local only, does not send mail and never prints private records to std
   own key. Links can be forwarded; anyone holding one can reveal its result.
 - Back up the archive key. Losing it cannot be fixed using Gmail credentials. Do not regenerate
   a draw to recover email state: that invalidates existing links.
-- One active campaign is supported. Starting another year requires intentionally archiving the
-  previous campaign and replacing its public dataset; there is no automatic reset command.
+- Multiple campaigns coexist by ID. There is no automatic reset, rename or deletion command.
 - Generic CLI failures deliberately omit raw JSON, Git and service errors to avoid leaking data.
   Check required variables, key length, participant validity, campaign ID/base URL, matching
   archive/JSON, correct executor, current remote branch and repository write permissions.
 - If a local process was forcibly stopped, first confirm no operation is running before manually
   removing `.private/operation.lock`. Then inspect delivery state before resuming.
-- `santa:demo` refuses any existing production archive or non-demo public draw. Use a separate
-  checkout for experiments instead of deleting campaign state.
+- `santa:demo` writes only the root demo draw and refuses to overwrite non-demo root data.
 
 ## Repository layout
 

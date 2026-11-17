@@ -1,6 +1,7 @@
 import { mkdir, open, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { drawPath, validateCampaignId } from '../src/lib/link';
 import { randomToken } from '../src/lib/crypto';
 import { openArchive, sealArchive } from './archive';
 import type { Campaign } from './campaign';
@@ -55,11 +56,11 @@ export async function withLock<T>(root: string, action: () => Promise<T>): Promi
   }
 }
 
-export function archivePath(root: string, executor: Campaign['executor']): string {
-  return join(
-    root,
-    executor === 'github-actions' ? 'state/campaign.enc.json' : '.private/campaign.enc.json',
-  );
+export function archivePath(root: string, executor: Campaign['executor'], id: string): string {
+  validateCampaignId(id);
+  const directory = executor === 'github-actions' ? 'state' : '.private';
+
+  return join(root, directory, 'campaigns', id, 'campaign.enc.json');
 }
 
 export async function readCampaign(path: string, key: string): Promise<Campaign> {
@@ -95,10 +96,13 @@ export function assertCurrentBranch(root: string, branch: string): void {
   }
 }
 
-export function persistGit(root: string, branch: string): void {
+export function persistGit(root: string, branch: string, id: string): void {
   assertCurrentBranch(root, branch);
 
-  const allowed = ['public/draws.json', 'state/campaign.enc.json'];
+  const allowed = [
+    `public/${drawPath(id)}`,
+    `state/campaigns/${validateCampaignId(id)}/campaign.enc.json`,
+  ];
   const staged = git(root, ['diff', '--cached', '--name-only']).split('\n').filter(Boolean);
 
   if (staged.some((path) => !allowed.includes(path))) {

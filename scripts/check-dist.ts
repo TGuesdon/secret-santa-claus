@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import { inspectDist } from './dist-guard';
+import { inspectDist, readPublicDraws } from './dist-guard';
 
-await inspectDist('dist', await readFile('public/draws.json', 'utf8'), process.env);
-console.log('Build verified: unchanged draw and no private files published.');
+await inspectDist('dist', await readPublicDraws('public'), process.env);
+console.log('Build verified: unchanged draws and no private files published.');

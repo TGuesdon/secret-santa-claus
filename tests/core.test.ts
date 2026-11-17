@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { encode, decode, encrypt, decrypt, randomToken } from '../src/lib/crypto';
-import { buildLink, parseLink } from '../src/lib/link';
+import { buildLink, parseLink, campaignFromSearch, drawPath } from '../src/lib/link';
 import { createCampaign, validateParticipants } from '../scripts/campaign';
 import { sealArchive, openArchive } from '../scripts/archive';
 
@@ -114,5 +114,28 @@ describe('encrypted archive', () => {
     expect(await openArchive(sealed, key)).toEqual(campaign);
     await expect(openArchive(sealed, randomToken(32))).rejects.toThrow();
     await expect(openArchive({ ...sealed, version: 99 }, key)).rejects.toThrow();
+  });
+});
+
+describe('campaign selection', () => {
+  it('selects campaign paths and keeps demo links queryless', () => {
+    expect(drawPath(campaignFromSearch('?campaign=family-2026'))).toBe(
+      'campaigns/family-2026/draws.json',
+    );
+    expect(drawPath(campaignFromSearch(''))).toBe('draws.json');
+    const url = buildLink(options.baseUrl, randomToken(16), randomToken(32), 'friends');
+
+    expect(new URL(url).search).toBe('?campaign=friends');
+  });
+
+  it.each([
+    '?campaign=',
+    '?campaign=../escape',
+    '?campaign=%2Fescape',
+    '?campaign=UPPER',
+    '?campaign=a&campaign=b',
+    `?campaign=${'a'.repeat(65)}`,
+  ])('rejects an invalid selector: %s', (search) => {
+    expect(() => campaignFromSearch(search)).toThrow();
   });
 });

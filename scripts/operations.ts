@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { isObject } from '../src/lib/draw-loader';
 import { validateBaseUrl } from '../src/lib/link';
 import { createCampaign, hashText, type Campaign } from './campaign';
 import {
@@ -26,10 +27,7 @@ export type CommandOptions = {
 };
 
 export async function generateDemo(workspace: Workspace, options: CommandOptions): Promise<void> {
-  const localArchiveExists = await exists(archivePath(workspace.root, 'local'));
-  const actionsArchiveExists = await exists(archivePath(workspace.root, 'github-actions'));
-
-  if (workspace.executor !== 'local' || localArchiveExists || actionsArchiveExists) {
+  if (workspace.executor !== 'local') {
     throw new Error('Demo generation cannot replace a production campaign.');
   }
 
@@ -63,7 +61,7 @@ async function resumePreparation(workspace: Workspace, id: string, baseUrl: stri
   if (await exists(workspace.publicPath)) {
     const publicHash = hashText(await readFile(workspace.publicPath, 'utf8'));
 
-    if (publicHash !== campaign.publicHash && !(await publicIsDemo(workspace))) {
+    if (publicHash !== campaign.publicHash) {
       throw new Error('The public draw was modified. Restore it before resuming.');
     }
   }
@@ -89,23 +87,38 @@ export async function prepareCampaign(
 
   const baseUrl = validateBaseUrl(options.baseUrl ?? requiredEnv('PUBLIC_BASE_URL'));
 
+  const otherExecutor = workspace.executor === 'local' ? 'github-actions' : 'local';
+  const otherArchiveExists = await exists(archivePath(workspace.root, otherExecutor, options.id));
+
+  if (otherArchiveExists) {
+    throw new Error('Another executor already owns this campaign.');
+  }
+
   if (await exists(workspace.archivePath)) {
     await resumePreparation(workspace, options.id, baseUrl);
 
     return;
   }
 
-  const otherExecutor = workspace.executor === 'local' ? 'github-actions' : 'local';
-  const otherArchiveExists = await exists(archivePath(workspace.root, otherExecutor));
-
-  if (otherArchiveExists || !(await publicIsDemo(workspace))) {
+  if (await exists(workspace.publicPath)) {
     throw new Error('Another campaign already owns the public draw.');
   }
 
   const participantJson = options.participantFile
     ? await readFile(options.participantFile, 'utf8')
     : requiredEnv('SANTA_PARTICIPANTS_JSON');
-  const { campaign } = await createCampaign(JSON.parse(participantJson), {
+  const participantInput: unknown = JSON.parse(participantJson);
+  let participants = participantInput;
+
+  if (!options.participantFile) {
+    if (!isObject(participantInput) || !Object.hasOwn(participantInput, options.id)) {
+      throw new Error('The participant map has no entry for this campaign.');
+    }
+
+    participants = participantInput[options.id];
+  }
+
+  const { campaign } = await createCampaign(participants, {
     id: options.id,
     baseUrl,
     executor: workspace.executor,
@@ -178,7 +191,7 @@ async function exportEmailPreviews(
   campaign: Campaign,
   sender: Sender,
 ): Promise<void> {
-  const directory = join(workspace.root, '.private/emails');
+  const directory = join(workspace.root, '.private/campaigns', campaign.id, 'emails');
 
   await mkdir(directory, { recursive: true });
 

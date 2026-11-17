@@ -1,10 +1,11 @@
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { atomicWrite, readCampaign } from './storage';
+import { validateCampaignId } from '../src/lib/link';
+import { archivePath, atomicWrite, readCampaign } from './storage';
 
 async function main(): Promise<void> {
   const { values } = parseArgs({
-    options: { archive: { type: 'string', default: 'state/campaign.enc.json' } },
+    options: { archive: { type: 'string' }, id: { type: 'string' } },
     strict: true,
     allowPositionals: false,
   });
@@ -14,8 +15,20 @@ async function main(): Promise<void> {
     throw new Error('Export requires a local archive key.');
   }
 
-  const campaign = await readCampaign(resolve(values.archive), key);
-  const relativePath = `.private/exports/${campaign.id}.json`;
+  if (Boolean(values.id) === Boolean(values.archive)) {
+    throw new Error('Provide either --id or --archive.');
+  }
+
+  const selectedPath = values.archive
+    ? resolve(values.archive)
+    : archivePath(process.cwd(), 'github-actions', validateCampaignId(values.id!));
+  const campaign = await readCampaign(selectedPath, key);
+
+  if (values.id && values.id !== campaign.id) {
+    throw new Error('The campaign identifier does not match the saved archive.');
+  }
+
+  const relativePath = `.private/campaigns/${campaign.id}/export.json`;
 
   // Plaintext stays in the ignored private directory, never on stdout or in dist.
   await atomicWrite(join(process.cwd(), relativePath), JSON.stringify(campaign, null, 2) + '\n');
@@ -23,6 +36,6 @@ async function main(): Promise<void> {
 }
 
 main().catch(() => {
-  console.error('Archive export failed. Check --archive and SANTA_ARCHIVE_KEY in .env.');
+  console.error('Archive export failed. Check --id or --archive and SANTA_ARCHIVE_KEY in .env.');
   process.exitCode = 1;
 });

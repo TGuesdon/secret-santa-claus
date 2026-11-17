@@ -29,8 +29,47 @@ export function validateBaseUrl(value: string): string {
   return url.href;
 }
 
-export function buildLink(baseUrl: string, id: string, key: string): string {
+export function validateCampaignId(id: string): string {
+  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(id)) {
+    throw new Error('Invalid campaign identifier.');
+  }
+
+  return id;
+}
+
+export function drawPath(campaignId?: string): string {
+  if (campaignId === undefined) {
+    return 'draws.json';
+  }
+
+  return `campaigns/${validateCampaignId(campaignId)}/draws.json`;
+}
+
+export function campaignFromSearch(search: string): string | undefined {
+  const parameters = new URLSearchParams(search);
+  const campaigns = parameters.getAll('campaign');
+
+  if (campaigns.length === 0) {
+    return undefined;
+  }
+
+  if (campaigns.length !== 1) {
+    throw new Error('Invalid campaign identifier.');
+  }
+
+  return validateCampaignId(campaigns[0]);
+}
+
+export function buildLink(baseUrl: string, id: string, key: string, campaignId?: string): string {
   parseLink(`#v1.${id}.${key}`);
 
-  return `${validateBaseUrl(baseUrl)}#v1.${id}.${key}`;
+  const url = new URL(validateBaseUrl(baseUrl));
+
+  if (campaignId !== undefined) {
+    url.searchParams.set('campaign', validateCampaignId(campaignId));
+  }
+
+  url.hash = `v1.${id}.${key}`;
+
+  return url.href;
 }

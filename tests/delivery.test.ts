@@ -4,7 +4,7 @@ import { PNG } from 'pngjs';
 import jsQR from 'jsqr';
 import { createCampaign, serializeDraw, type Campaign } from '../scripts/campaign';
 import { composeMail } from '../scripts/mail';
-import { deliver } from '../scripts/delivery';
+import { deliver, verifyPublished } from '../scripts/delivery';
 
 const sender = { email: 'santa@example.com', name: 'Santa Claus 🎅' };
 
@@ -215,4 +215,26 @@ it('blocks unconfirmed sends, demo, executor mismatch and unpublished data befor
     ).rejects.toThrow();
     expect(campaign.records.every((r) => r.status === 'pending')).toBe(true);
   }
+});
+
+it('verifies the selected campaign URL and refuses another campaign draw', async () => {
+  const { campaign } = await fixture();
+  const { campaign: other } = await createCampaign(
+    [
+      { name: 'Charlie', email: 'charlie@example.com' },
+      { name: 'Diane', email: 'diane@example.com' },
+    ],
+    { id: 'other', executor: 'local', baseUrl: campaign.baseUrl },
+  );
+  const requested: string[] = [];
+
+  await verifyPublished(campaign, async (url) => {
+    requested.push(String(url));
+
+    return new Response(campaign.publicJson);
+  });
+  expect(requested).toEqual(['https://example.com/santa/campaigns/test/draws.json']);
+  await expect(
+    verifyPublished(campaign, async () => new Response(other.publicJson)),
+  ).rejects.toThrow(/published draw/);
 });

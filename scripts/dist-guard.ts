@@ -1,15 +1,33 @@
 import { lstat, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { drawPath, validateCampaignId } from '../src/lib/link';
 import { validateDraw } from '../src/lib/draw-loader';
 
 export async function inspectDist(
   root: string,
-  expectedDraw: string,
+  expectedDraws: Record<string, string>,
   env: NodeJS.ProcessEnv,
 ): Promise<void> {
-  validateDraw(JSON.parse(expectedDraw));
-  if ((await readFile(join(root, 'draws.json'), 'utf8')) !== expectedDraw) {
-    throw new Error('The build modified the public draw.');
+  const allowedDirectories = new Set(['assets']);
+
+  for (const [relative, expectedDraw] of Object.entries(expectedDraws)) {
+    if (relative !== 'draws.json') {
+      const match = /^campaigns\/([^/]+)\/draws\.json$/.exec(relative);
+
+      if (!match) {
+        throw new Error('Invalid public draw path.');
+      }
+
+      validateCampaignId(match[1]);
+      allowedDirectories.add('campaigns');
+      allowedDirectories.add(`campaigns/${match[1]}`);
+    }
+
+    validateDraw(JSON.parse(expectedDraw));
+
+    if ((await readFile(join(root, relative), 'utf8')) !== expectedDraw) {
+      throw new Error('The build modified the public draw.');
+    }
   }
 
   const secrets = Object.entries(env)
@@ -41,19 +59,18 @@ export async function inspectDist(
       }
 
       if (info.isDirectory()) {
-        if (relative !== 'assets') {
+        if (!allowedDirectories.has(relative)) {
           throw new Error('Unexpected directory in the build.');
         }
 
-        await inspect(path, 'assets/');
+        await inspect(path, `${relative}/`);
         continue;
       }
 
       // Allow new asset categories explicitly to keep private files out of the site.
       if (
-        !['index.html', 'draws.json', 'favicon.ico', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(
-          relative,
-        ) &&
+        !Object.hasOwn(expectedDraws, relative) &&
+        !['index.html', 'favicon.ico', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(relative) &&
         !/^assets\/[\w-]+\.(js|css|webp|ttf)$/.test(relative)
       ) {
         throw new Error('Unexpected file in the build.');
@@ -71,4 +88,30 @@ export async function inspectDist(
   }
 
   await inspect(root);
+}
+
+export async function readPublicDraws(publicRoot: string): Promise<Record<string, string>> {
+  const draws: Record<string, string> = {
+    'draws.json': await readFile(join(publicRoot, 'draws.json'), 'utf8'),
+  };
+  const campaignDirectory = join(publicRoot, 'campaigns');
+  let campaigns;
+
+  try {
+    campaigns = await readdir(campaignDirectory);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return draws;
+    }
+
+    throw error;
+  }
+
+  for (const id of campaigns) {
+    const relative = drawPath(id);
+
+    draws[relative] = await readFile(join(publicRoot, relative), 'utf8');
+  }
+
+  return draws;
 }

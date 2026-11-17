@@ -1,6 +1,6 @@
 import { createHash, randomInt } from 'node:crypto';
 import { encrypt, randomToken } from '../src/lib/crypto';
-import { buildLink, validateBaseUrl } from '../src/lib/link';
+import { buildLink, validateBaseUrl, validateCampaignId } from '../src/lib/link';
 import type { PublicDraw } from '../src/lib/draw-loader';
 import { validateParticipants, type Participant } from './participants';
 
@@ -60,9 +60,7 @@ export async function createCampaign(
 ) {
   const participants = validateParticipants(input);
 
-  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(options.id)) {
-    throw new Error('Invalid campaign identifier.');
-  }
+  validateCampaignId(options.id);
 
   const baseUrl = validateBaseUrl(options.baseUrl);
   const recipients = drawRecipients(participants);
@@ -84,7 +82,7 @@ export async function createCampaign(
       throw new Error('Duplicate opaque identifier.');
     }
 
-    const url = buildLink(baseUrl, id, key);
+    const url = buildLink(baseUrl, id, key, demo ? undefined : options.id);
     const plaintext = { participantName: participant.name, recipientName };
 
     publicDraw.entries[id] = await encrypt(plaintext, key);

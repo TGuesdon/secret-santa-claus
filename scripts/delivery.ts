@@ -1,3 +1,4 @@
+import { drawPath } from '../src/lib/link';
 import { validateCampaign } from './archive';
 import { hashText, type Campaign } from './campaign';
 import { composeMail, validateSender, type Sender } from './mail';
@@ -17,10 +18,13 @@ export async function verifyPublished(
   fetcher: typeof fetch = fetch,
 ): Promise<void> {
   try {
-    const response = await fetcher(new URL('draws.json', campaign.baseUrl), {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(30_000),
-    });
+    const response = await fetcher(
+      new URL(drawPath(campaign.mode === 'demo' ? undefined : campaign.id), campaign.baseUrl),
+      {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(30_000),
+      },
+    );
 
     if (!response.ok || hashText(await response.text()) !== campaign.publicHash) {
       throw new Error();

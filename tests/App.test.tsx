@@ -7,7 +7,7 @@ import { encrypt } from '../src/lib/crypto';
 import { loadDraw } from '../src/lib/draw-loader';
 
 beforeEach(() => {
-  window.location.hash = '';
+  window.history.replaceState(null, '', '/');
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
 });
@@ -210,4 +210,36 @@ it('shows the French reveal immediately and recovers from blocked autoplay', asy
 
   fireEvent.click(enableSound);
   expect(screen.getByRole('button', { name: 'Son' })).toBeDefined();
+});
+
+it('loads the campaign selected in the personal URL', async () => {
+  await mockDraw();
+  window.history.replaceState(
+    null,
+    '',
+    `/?campaign=family#v1.${fixtures[0].id}.${fixtures[0].key}`,
+  );
+  vi.useFakeTimers();
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  await act(() => vi.advanceTimersByTimeAsync(6900));
+  vi.useRealTimers();
+
+  expect((await screen.findByRole('status')).textContent).toContain('Bob');
+  expect(fetch).toHaveBeenCalledWith('/campaigns/family/draws.json', expect.any(Object));
+});
+
+it('rejects an invalid campaign query before fetching', () => {
+  const fetcher = vi.fn();
+
+  vi.stubGlobal('fetch', fetcher);
+  window.history.replaceState(
+    null,
+    '',
+    `/?campaign=../escape#v1.${fixtures[0].id}.${fixtures[0].key}`,
+  );
+  render(<App />);
+
+  expect(screen.queryByRole('button', { name: /révéler/i })).toBeNull();
+  expect(fetcher).not.toHaveBeenCalled();
 });

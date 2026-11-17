@@ -1,6 +1,6 @@
 import { decrypt, encrypt, type Encrypted } from '../src/lib/crypto';
 import { isObject, validateDraw } from '../src/lib/draw-loader';
-import { buildLink, validateBaseUrl } from '../src/lib/link';
+import { buildLink, validateBaseUrl, validateCampaignId } from '../src/lib/link';
 import { hashText, validateParticipants, type Campaign, type DeliveryRecord } from './campaign';
 
 function stringField(object: Record<string, unknown>, field: string): string {
@@ -33,9 +33,7 @@ function readHeader(value: unknown): Omit<Campaign, 'records'> {
   const publicHash = stringField(value, 'publicHash');
   const publicJson = stringField(value, 'publicJson');
 
-  if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(id)) {
-    throw new Error('Invalid campaign identifier.');
-  }
+  validateCampaignId(id);
 
   if (!/^[a-f0-9]{64}$/.test(publicHash) || hashText(publicJson) !== publicHash) {
     throw new Error('The archive does not match its public data hash.');
@@ -103,7 +101,14 @@ export function validateCampaign(value: unknown): Campaign {
       throw new Error('A delivery record is missing from the public draw.');
     }
 
-    if (buildLink(header.baseUrl, record.id, record.key) !== record.url) {
+    if (
+      buildLink(
+        header.baseUrl,
+        record.id,
+        record.key,
+        header.mode === 'demo' ? undefined : header.id,
+      ) !== record.url
+    ) {
       throw new Error('A personal URL does not match its record.');
     }
 

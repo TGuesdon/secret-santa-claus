@@ -68,19 +68,25 @@ it('persists encrypted state to the remote and detects a stale checkout', async 
     { id: 'test', executor: 'github-actions', baseUrl: 'https://example.com/' },
   );
   const key = randomToken(32);
-  const archive = join(a, 'state/campaign.enc.json');
+  const archive = join(a, 'state/campaigns/test/campaign.enc.json');
 
-  await atomicWrite(join(a, 'public/draws.json'), campaign.publicJson);
+  await atomicWrite(join(a, 'public/campaigns/test/draws.json'), campaign.publicJson);
   await saveCampaign(archive, campaign, key);
-  persistGit(a, 'main');
+  await atomicWrite(join(a, 'public/campaigns/other/draws.json'), campaign.publicJson);
+  persistGit(a, 'main', 'test');
   campaign.records[0].status = 'sending';
   await saveCampaign(archive, campaign, key);
-  persistGit(a, 'main');
+  persistGit(a, 'main', 'test');
+
+  expect(git(a, 'status', '--porcelain')).toContain('public/campaigns/other/');
+  git(a, 'add', '--', 'public/campaigns/other/draws.json');
+  expect(() => persistGit(a, 'main', 'test')).toThrow(/unexpected files/);
+  git(a, 'reset', '--', 'public/campaigns/other/draws.json');
 
   git(b, 'pull', '--ff-only', 'origin', 'main');
-  expect((await readCampaign(join(b, 'state/campaign.enc.json'), key)).records[0].status).toBe(
-    'sending',
-  );
+  expect(
+    (await readCampaign(join(b, 'state/campaigns/test/campaign.enc.json'), key)).records[0].status,
+  ).toBe('sending');
   await writeFile(join(b, 'README.md'), 'changed elsewhere');
   git(
     b,
@@ -104,29 +110,67 @@ it('rejects private files, modified public data and configured secrets in the bu
   await writeFile(join(root, 'index.html'), '<html></html>');
   await writeFile(join(root, 'draws.json'), json);
   await writeFile(join(root, 'assets/index-abc.js'), 'public code');
-  await expect(inspectDist(root, json, {})).resolves.toBeUndefined();
+  await expect(inspectDist(root, { 'draws.json': json }, {})).resolves.toBeUndefined();
 
   await writeFile(join(root, 'archive.enc.json'), 'secret');
-  await expect(inspectDist(root, json, {})).rejects.toThrow();
+  await expect(inspectDist(root, { 'draws.json': json }, {})).rejects.toThrow();
   await rm(join(root, 'archive.enc.json'));
   await writeFile(join(root, 'jingle_bell.mp3'), Buffer.from([0x49, 0x44, 0x33]));
   await writeFile(join(root, 'intro_loop.mp3'), Buffer.from([0x49, 0x44, 0x33]));
   await writeFile(join(root, 'assets/christmas-friends-abc.webp'), 'public illustration');
   await writeFile(join(root, 'assets/fredoka-abc.ttf'), 'public font');
-  await expect(inspectDist(root, json, {})).resolves.toBeUndefined();
+  await expect(inspectDist(root, { 'draws.json': json }, {})).resolves.toBeUndefined();
 
   await writeFile(join(root, 'assets/index-abc.js'), 'leaked-app-password');
   await expect(
-    inspectDist(root, json, { GOOGLE_APPLICATION_PASSWORD: 'leaked-app-password' }),
+    inspectDist(
+      root,
+      { 'draws.json': json },
+      { GOOGLE_APPLICATION_PASSWORD: 'leaked-app-password' },
+    ),
   ).rejects.toThrow();
   await expect(
-    inspectDist(root, json, { GOOGLE_APPLICATION_PASSWORD: 'leaked app password' }),
+    inspectDist(
+      root,
+      { 'draws.json': json },
+      { GOOGLE_APPLICATION_PASSWORD: 'leaked app password' },
+    ),
   ).resolves.toBeUndefined();
   await writeFile(join(root, 'assets/index-abc.js'), 'leakedapppassword');
   await expect(
-    inspectDist(root, json, { GOOGLE_APPLICATION_PASSWORD: 'leaked app password' }),
+    inspectDist(
+      root,
+      { 'draws.json': json },
+      { GOOGLE_APPLICATION_PASSWORD: 'leaked app password' },
+    ),
   ).rejects.toThrow();
   await writeFile(join(root, 'assets/index-abc.js'), 'public code');
   await writeFile(join(root, 'draws.json'), '{}');
-  await expect(inspectDist(root, json, {})).rejects.toThrow();
+  await expect(inspectDist(root, { 'draws.json': json }, {})).rejects.toThrow();
+});
+
+it('verifies every campaign draw and rejects missing, changed or unexpected campaign files', async () => {
+  const root = await directory();
+  const json = '{"version":1,"entries":{}}\n';
+  const expected = {
+    'draws.json': json,
+    'campaigns/family/draws.json': json,
+    'campaigns/friends/draws.json': json,
+  };
+
+  for (const [path, contents] of Object.entries(expected)) {
+    await atomicWrite(join(root, path), contents);
+  }
+
+  await expect(inspectDist(root, expected, {})).resolves.toBeUndefined();
+  await rm(join(root, 'campaigns/friends/draws.json'));
+  await expect(inspectDist(root, expected, {})).rejects.toThrow();
+  await atomicWrite(join(root, 'campaigns/friends/draws.json'), '{}');
+  await expect(inspectDist(root, expected, {})).rejects.toThrow();
+  await atomicWrite(join(root, 'campaigns/friends/draws.json'), json);
+  await atomicWrite(join(root, 'campaigns/friends/links.json'), 'private');
+  await expect(inspectDist(root, expected, {})).rejects.toThrow();
+  await rm(join(root, 'campaigns/friends/links.json'));
+  await atomicWrite(join(root, 'campaigns/extra/draws.json'), json);
+  await expect(inspectDist(root, expected, {})).rejects.toThrow();
 });
