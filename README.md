@@ -1,8 +1,12 @@
+![Secret Santa Christmas scene](docs/screenshots/desktop.jpg)
+
 # Secret Santa
 
 A static family Secret Santa with encrypted personal results, QR codes and Gmail delivery.
 React + TypeScript + Vite on GitHub Pages; Node scripts run locally and in manual GitHub Actions.
-The interface is intentionally minimal. Visual work comes later.
+The responsive Christmas cartoon interface includes a musical, animated gift reveal.
+
+[Browse the desktop and mobile screenshots](docs/screenshots/README.md).
 
 ## Quick start
 
@@ -13,8 +17,9 @@ npm ci
 npm run dev
 ```
 
-The checked-in demo draw is ready to use at `http://localhost:5173/`.
-To regenerate its encrypted entries and create the four QR codes:
+The local app reads the current `public/draws.json`. Open a personal link belonging to
+that draw. The links below work when the public file contains the fictional demo.
+To generate that demo and create its four QR codes:
 
 ```sh
 npm run santa:demo
@@ -40,7 +45,38 @@ npm run santa:demo -- --base-url https://pjdevs.github.io/secret-santa-claus/
 That is an example deployment address, not a claim that the site is currently deployed.
 Demo generation refuses to replace a real campaign.
 
+## Christmas experience
+
+Open a valid invitation to reach the reveal button directly. The looping intro
+attempts autoplay; when blocked, **Activer le son** enables it with a user gesture.
+The intro requests audible playback immediately: starting at zero volume and fading
+up can make Firefox pause an initially permitted silent autoplay.
+**Révéler mon tirage** starts the jingle and unwraps the gift at 6.8 seconds of playback.
+The result is decrypted during the build-up and stays
+out of the page until the drop. A slow connection waits for the verified result.
+
+The jingle loops with a short fade at its end. The sound control fades music out
+before pausing. Blocked, unavailable or disabled audio uses a silent reveal clock.
+Motion can be paused, and the system's reduced-motion preference disables movement.
+Both controls remain available after the result appears.
+
+The web interface is in French. Code, documentation, internal errors and emails stay
+in English. The browser title is exactly `Secret Santa`.
+
+The display font and illustration are self-hosted. Asset origins and the generation
+prompt are documented in `src/assets/ASSETS.md`; no external image or font request
+is needed at runtime.
+
 ## Development checks
+
+### Asset locations
+
+`public/` holds files served unchanged at stable URLs: music, the favicon and the
+encrypted draw. `src/assets/` holds illustrations and fonts imported by the app;
+Vite bundles them with content-hashed filenames for caching and deployment paths.
+Documentation screenshots live in `docs/screenshots/` and are not shipped with the app.
+
+### Verification
 
 ```sh
 npm run ci

@@ -111,6 +111,8 @@ it('rejects private files, modified public data and configured secrets in the bu
   await rm(join(root, 'archive.enc.json'));
   await writeFile(join(root, 'jingle_bell.mp3'), Buffer.from([0x49, 0x44, 0x33]));
   await writeFile(join(root, 'intro_loop.mp3'), Buffer.from([0x49, 0x44, 0x33]));
+  await writeFile(join(root, 'assets/christmas-friends-abc.webp'), 'public illustration');
+  await writeFile(join(root, 'assets/fredoka-abc.ttf'), 'public font');
   await expect(inspectDist(root, json, {})).resolves.toBeUndefined();
 
   await writeFile(join(root, 'assets/index-abc.js'), 'leaked-app-password');

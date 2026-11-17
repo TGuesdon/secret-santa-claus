@@ -5,11 +5,16 @@
 A static family Secret Santa built with React, TypeScript and Vite, hosted on GitHub Pages.
 Node scripts generate assignments, encrypt individual results, create personal links and QR
 codes, and send emails through Gmail SMTP with an app password. The same commands run locally and in
-a manually triggered GitHub Actions workflow. Visual design is deferred.
+a manually triggered GitHub Actions workflow. The UI is a responsive Christmas cartoon
+experience with direct access, best-effort intro autoplay and a reveal at 6.8 seconds.
 
 ## Repository map
 
 - `src/`: React UI and shared browser-compatible encryption, links and draw loading.
+- `src/components/`: decorative Christmas scene and small SVG icons.
+- `src/lib/soundtrack.ts`: intro/jingle playback, drop timing, fades and silent fallback.
+- `src/assets/`: self-hosted display font and original Christmas illustration.
+- `PRODUCT.md` and `DESIGN.md`: product constraints and the visual system.
 - `scripts/`: campaigns, encrypted archives, private files, SMTP email delivery and CLI.
 - `fixtures/demo.json`: four fictional participants with intentionally public test keys.
 - `public/draws.json`: the only published data file; encrypted individual results only.
@@ -21,13 +26,15 @@ a manually triggered GitHub Actions workflow. Visual design is deferred.
 - `public/jingle_bell.mp3`: user-provided music, copied unchanged into the built site.
   Preserve user-provided resources unless the task requires changes.
 - `docs/superpowers/`: approved design, implementation plan and progress notes.
+- `docs/screenshots/`: desktop and mobile captures using fictional demo participants.
 
 ## Readability
 
 Readability takes priority over brevity and line count. Code must not need to be mentally
 unpacked before a maintainer can understand it.
 
-- Write repository content in English: code, comments, documentation, errors, UI and emails.
+- Write code, comments, documentation, internal errors and emails in English.
+  The web interface and its user-facing errors are in French. Keep the browser title exactly `Secret Santa`.
   Preserve user-provided reference resources as supplied.
 - Use one declaration and one statement per line. Do not chain variable declarations.
 - Always use braces around conditionals and loops, including single-statement branches.

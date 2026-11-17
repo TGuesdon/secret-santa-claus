@@ -1,0 +1,72 @@
+.festive-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.floating-gifts > span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  opacity: 0.4;
+}
+
+.floating-gifts .icon {
+  width: 100%;
+  height: 100%;
+  stroke: #ffe29a;
+  fill: #a83e75;
+  stroke-width: 1.3;
+}
+
+.floating-gifts > span:nth-child(even) .icon {
+  fill: #288b83;
+  stroke: #b9f4db;
+}
+
+.sky-star {
+  position: absolute;
+  opacity: 0.6;
+  width: var(--star-size);
+  height: var(--star-size);
+}
+
+.sky-star .icon {
+  width: 100%;
+  height: 100%;
+  fill: #ffd36a;
+  stroke: #ffebad;
+  stroke-width: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .christmas-app:not(.motion-paused) {
+    .floating-gifts > span {
+      animation: gift-drift var(--duration) ease-in-out var(--delay) infinite alternate;
+    }
+
+    .sky-star {
+      animation: sky-star-drift 5s ease-in-out var(--star-delay) infinite alternate;
+    }
+  }
+}
+
+@keyframes gift-drift {
+  from {
+    transform: translate(0, 0) rotate(-18deg);
+  }
+  to {
+    transform: translate(var(--drift-x), var(--drift-y)) rotate(var(--spin));
+  }
+}
+
+@keyframes sky-star-drift {
+  to {
+    transform: translateY(-12px) rotate(24deg);
+    opacity: 0.85;
+  }
+}

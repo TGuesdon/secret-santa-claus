@@ -54,7 +54,7 @@ export async function inspectDist(
         !['index.html', 'draws.json', 'favicon.ico', 'jingle_bell.mp3', 'intro_loop.mp3'].includes(
           relative,
         ) &&
-        !/^assets\/[\w-]+\.(js|css)$/.test(relative)
+        !/^assets\/[\w-]+\.(js|css|webp|ttf)$/.test(relative)
       ) {
         throw new Error('Unexpected file in the build.');
       }
