@@ -10,8 +10,8 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
 
 ## Repository map
 
-- `src/`: React UI and shared browser-compatible encryption, links and draw loading.
-- `src/config/`: static `/config/` editor for campaign JSON, import and export.
+- `src/`: Vite root with HTML routes, React UI and shared browser-compatible encryption, links and draw loading.
+- `src/config/`: React UI and `/config/` HTML entry for editing campaign JSON, imports and exports.
 - `src/components/`: shared brand/buttons/form fields, decorative Christmas scene and SVG icons.
 - `src/lib/participants.ts` and `assignment.ts`: shared CLI/browser validation and matching.
 - `src/lib/soundtrack.ts`: intro/jingle playback, drop timing, fades and silent fallback.
@@ -25,7 +25,6 @@ experience with direct access, best-effort intro autoplay and a reveal at 6.8 se
 - `.private/`: ignored local private files, never published or uploaded as artifacts.
 - `.github/workflows/`: CI, deployment and manually triggered campaign operations.
 - `tests/`: crypto, assignment, delivery, recovery, CLI and UI tests.
-- `index.html`: Vite HTML entry, importing `src/main.tsx`.
 - `public/jingle_bell.mp3`: user-provided music, copied unchanged into the built site.
   Preserve user-provided resources unless the task requires changes.
 - `docs/superpowers/`: approved design, implementation plan and progress notes.

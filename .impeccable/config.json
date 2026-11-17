@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/style.css"
+        ],
+        "createdAt": "2026-11-17T14:08:19.387Z",
+        "reason": "Agent review: .present-body and .present-lid are outlines of the animated gift, documented in DESIGN.md as its retained body and opening lid; they are not card side tabs."
+      }
+    ]
+  }
+}

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-17T00:22:36.344Z",
+  "generatedAt": "2026-11-17T14:34:50.357Z",
   "title": "Design System: Secret Santa",
   "extensions": {
     "colorMeta": {
       "candy-red": {
         "role": "primary",
-        "displayName": "Candy Red",
+        "displayName": "Candy red",
         "tonalRamp": [
           "oklch(15% 0.1983 18.09)",
           "oklch(27% 0.1983 18.09)",
@@ -20,7 +20,7 @@
       },
       "candy-red-hover": {
         "role": "primary",
-        "displayName": "Candy Red Hover",
+        "displayName": "Candy red hover",
         "tonalRamp": [
           "oklch(15% 0.2034 19.46)",
           "oklch(27% 0.2034 19.46)",
@@ -34,7 +34,7 @@
       },
       "candy-red-active": {
         "role": "primary",
-        "displayName": "Candy Red Active",
+        "displayName": "Candy red pressed",
         "tonalRamp": [
           "oklch(15% 0.1765 17.74)",
           "oklch(27% 0.1765 17.74)",
@@ -48,7 +48,7 @@
       },
       "candy-red-disabled": {
         "role": "primary",
-        "displayName": "Candy Red Disabled",
+        "displayName": "Candy red disabled",
         "tonalRamp": [
           "oklch(15% 0.1243 359.11)",
           "oklch(27% 0.1243 359.11)",
@@ -62,7 +62,7 @@
       },
       "night": {
         "role": "secondary",
-        "displayName": "Night",
+        "displayName": "Christmas-night blue",
         "tonalRamp": [
           "oklch(15% 0.1124 260.30)",
           "oklch(27% 0.1124 260.30)",
@@ -76,7 +76,7 @@
       },
       "gold": {
         "role": "tertiary",
-        "displayName": "Gold",
+        "displayName": "Festive gold",
         "tonalRamp": [
           "oklch(15% 0.1325 86.73)",
           "oklch(27% 0.1325 86.73)",
@@ -90,7 +90,7 @@
       },
       "ivory": {
         "role": "neutral",
-        "displayName": "Ivory",
+        "displayName": "Warm ivory",
         "tonalRamp": [
           "oklch(15% 0.0211 85.94)",
           "oklch(27% 0.0211 85.94)",
@@ -104,7 +104,7 @@
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Muted",
+        "displayName": "Ice blue",
         "tonalRamp": [
           "oklch(15% 0.0386 262.93)",
           "oklch(27% 0.0386 262.93)",
@@ -118,7 +118,7 @@
       },
       "control-surface": {
         "role": "neutral",
-        "displayName": "Control Surface",
+        "displayName": "Deep blue control surface",
         "tonalRamp": [
           "oklch(15% 0.0957 261.70)",
           "oklch(27% 0.0957 261.70)",
@@ -132,7 +132,7 @@
       },
       "control-border": {
         "role": "neutral",
-        "displayName": "Control Border",
+        "displayName": "Blue control border",
         "tonalRamp": [
           "oklch(15% 0.1000 258.78)",
           "oklch(27% 0.1000 258.78)",
@@ -143,16 +143,62 @@
           "oklch(84% 0.1000 258.78)",
           "oklch(95% 0.1000 258.78)"
         ]
+      },
+      "control-hover": {
+        "role": "neutral",
+        "displayName": "Lighter blue control state",
+        "tonalRamp": [
+          "oklch(15% 0.1206 259.09)",
+          "oklch(27% 0.1206 259.09)",
+          "oklch(38% 0.1206 259.09)",
+          "oklch(49% 0.1206 259.09)",
+          "oklch(61% 0.1206 259.09)",
+          "oklch(72% 0.1206 259.09)",
+          "oklch(84% 0.1206 259.09)",
+          "oklch(95% 0.1206 259.09)"
+        ]
+      },
+      "campaign-field": {
+        "role": "neutral",
+        "displayName": "Deep campaign field",
+        "tonalRamp": [
+          "oklch(15% 0.0869 262.59)",
+          "oklch(27% 0.0869 262.59)",
+          "oklch(38% 0.0869 262.59)",
+          "oklch(49% 0.0869 262.59)",
+          "oklch(61% 0.0869 262.59)",
+          "oklch(72% 0.0869 262.59)",
+          "oklch(84% 0.0869 262.59)",
+          "oklch(95% 0.0869 262.59)"
+        ]
+      },
+      "campaign-divider": {
+        "role": "neutral",
+        "displayName": "Campaign divider blue",
+        "tonalRamp": [
+          "oklch(15% 0.0960 255.92)",
+          "oklch(27% 0.0960 255.92)",
+          "oklch(38% 0.0960 255.92)",
+          "oklch(49% 0.0960 255.92)",
+          "oklch(61% 0.0960 255.92)",
+          "oklch(72% 0.0960 255.92)",
+          "oklch(84% 0.0960 255.92)",
+          "oklch(95% 0.0960 255.92)"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Balanced scene headings."
+        "purpose": "Balanced headings on the reveal stage."
+      },
+      "config-title": {
+        "displayName": "Configuration title",
+        "purpose": "The campaign editor page heading."
       },
       "recipient": {
         "displayName": "Recipient",
-        "purpose": "The revealed name with flexible wrapping."
+        "purpose": "The revealed name, with flexible wrapping."
       },
       "brand": {
         "displayName": "Brand",
@@ -160,15 +206,19 @@
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Instructions and supporting copy."
+        "purpose": "Instructions, supporting copy, and editor content."
       },
       "button": {
         "displayName": "Primary action",
-        "purpose": "Entrance and reveal labels."
+        "purpose": "Reveal and campaign actions."
       },
       "control": {
         "displayName": "Control",
-        "purpose": "Sound and motion labels."
+        "purpose": "Quiet controls and compact editor actions."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Bold labels above campaign fields."
       }
     },
     "shadows": [
@@ -292,6 +342,14 @@
       {
         "name": "large-stage",
         "value": "(min-width: 1400px) and (min-height: 850px)"
+      },
+      {
+        "name": "config-tablet",
+        "value": "(max-width: 900px)"
+      },
+      {
+        "name": "config-mobile",
+        "value": "(max-width: 600px)"
       }
     ]
   },
@@ -334,30 +392,87 @@
       "description": "The decorative paper tag on the CSS present.",
       "html": "<span class=\"ds-tag\" aria-hidden=\"true\">Pour toi</span>",
       "css": ".ds-tag { display:inline-block; padding:7px 13px; color:#753528; border-radius:3px; background:#fff5d9; font:400 18px Fredoka,sans-serif; transform:rotate(13deg); box-shadow:0 2px 4px #74242a24; }"
+    },
+    {
+      "name": "Editor primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact primary action used for campaign editor tasks.",
+      "html": "<button class=\"ds-editor-primary\">Générer le JSON</button>",
+      "css": ".ds-editor-primary { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:52px; padding:14px 20px; border:0; border-radius:14px; background:#ce2945; color:#fff8e9; box-shadow:0 8px 18px #071b4970; font:500 18px/1.25 Fredoka,sans-serif; cursor:pointer; transition:background 180ms,box-shadow 180ms; } .ds-editor-primary:hover:not(:disabled) { background:#cf233f; box-shadow:0 9px 24px #a0253238; } .ds-editor-primary:active:not(:disabled) { background:#a91835; } .ds-editor-primary:focus-visible { outline:3px solid #ffd36a; outline-offset:5px; } .ds-editor-primary:disabled { background:#8d3557; box-shadow:none; cursor:default; }"
+    },
+    {
+      "name": "Campaign identifier field",
+      "kind": "input",
+      "description": "Labelled campaign ID field with hint and visible focus state.",
+      "html": "<div class=\"ds-field\"><label for=\"campaign-id\">Identifiant de campagne</label><p class=\"ds-hint\" id=\"campaign-id-hint\">Lettres minuscules, chiffres ou tirets.</p><input id=\"campaign-id\" aria-describedby=\"campaign-id-hint\" value=\"famille-2026\"></div>",
+      "css": ".ds-field { display:flex; flex-direction:column; gap:6px; min-width:0; } .ds-field label { color:#fff8e9; font:700 14px/1.5 \"Trebuchet MS\",system-ui,sans-serif; } .ds-field input { width:100%; min-width:0; min-height:48px; padding:11px 12px; border:1px solid #6c93cf; border-radius:14px; background:#102653; color:#fff8e9; font:16px/1.5 \"Trebuchet MS\",system-ui,sans-serif; } .ds-field input::placeholder { color:#d7e5ff; opacity:1; } .ds-field input:focus-visible { outline:3px solid #ffd36a; outline-offset:3px; } .ds-field input[aria-invalid=\"true\"] { border-color:#ffd36a; } .ds-field .ds-hint { max-width:65ch; margin:0 0 4px; color:#d7e5ff; font-size:13px; line-height:1.6; }"
+    },
+    {
+      "name": "Campaign navigation item",
+      "kind": "nav",
+      "description": "Campaign selector with a gold active outline and participant count.",
+      "html": "<button class=\"ds-campaign-choice\" aria-current=\"page\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 10h18v4H3zM5 14v8h14v-8M12 10v12\"></path><path d=\"M12 10H8a3 3 0 1 1 3-3l1 3Zm0 0h4a3 3 0 1 0-3-3l-1 3Z\"></path></svg><span><strong>famille-2026</strong><small>5 participants</small></span></button>",
+      "css": ".ds-campaign-choice { display:flex; align-items:center; gap:12px; min-height:72px; padding:14px; border:1px solid transparent; border-radius:14px; color:#fff8e9; background:transparent; text-align:start; overflow-wrap:anywhere; font:inherit; cursor:pointer; } .ds-campaign-choice[aria-current=\"page\"] { border-color:#ffd36a; background:#234e91; } .ds-campaign-choice:hover { background:#234e91; } .ds-campaign-choice .ds-icon { width:20px; height:24px; flex:none; color:#ffd36a; } .ds-campaign-choice strong, .ds-campaign-choice small { display:block; } .ds-campaign-choice strong { font-size:15px; } .ds-campaign-choice small { margin-top:4px; color:#d7e5ff; font-size:13px; } .ds-campaign-choice:focus-visible { outline:3px solid #ffd36a; outline-offset:5px; }"
+    },
+    {
+      "name": "Campaign editor panel",
+      "kind": "card",
+      "description": "Calm bordered surface grouping the active campaign fields.",
+      "html": "<section class=\"ds-campaign-editor\"><h2>famille-2026</h2></section>",
+      "css": ".ds-campaign-editor { padding:28px; border:1px solid #41699e; border-radius:14px; background:#183366; color:#fff8e9; } .ds-campaign-editor h2 { margin:0; font:500 28px/1.2 Fredoka,sans-serif; overflow-wrap:anywhere; }"
+    },
+    {
+      "name": "Exclusion chip",
+      "kind": "chip",
+      "description": "Removable participant exclusion in the campaign editor.",
+      "html": "<button class=\"ds-chip\" aria-label=\"Supprimer l’exclusion de Alice\">Alice <span aria-hidden=\"true\">×</span></button>",
+      "css": ".ds-chip { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid #6c93cf; border-radius:24px; background:#234e91; color:#fff8e9; text-align:start; overflow-wrap:anywhere; font:14px/1.5 \"Trebuchet MS\",system-ui,sans-serif; cursor:pointer; transition:background 160ms,border-color 160ms; } .ds-chip:hover { background:#183366; border-color:#a9c9ff; } .ds-chip:focus-visible { outline:3px solid #ffd36a; outline-offset:5px; } .ds-chip:active { background:#102653; }"
     }
   ],
   "narrative": {
-    "northStar": "Kitsch Christmas game stage",
-    "overview": "A saturated Christmas-night blue stage holds a deliberately kitsch party of Santa,\nreindeer, fir trees and presents. Golden headings, candy red actions, hanging fairy\nlights and oversized blue geometry give the experience the exuberance of a game.\nRounded lettering and original picture-book characters keep it friendly and personal.\n\nThe illustration, waving Santa, drifting gifts, stars, snow and swinging bulbs surround one clear reveal\naction. The recipient takes center stage after the musical build-up. Sound and\nmotion remain optional, with the same readable result in silent or reduced-motion\nuse. All web interface copy and user-facing errors are French; documentation,\ninternal errors remain English. Emails are French. The browser title is exactly `Secret Santa`.\n\n**Key Characteristics:",
+    "northStar": "Kitsch Christmas Game Stage",
+    "overview": "A Christmas-night blue stage gives the original Santa, reindeer, fir trees, fairy lights, and presents room to form an exuberant cartoon scene. Rounded display lettering and warm festive accents make the reveal feel like a personal Christmas game: generous, playful, and deliberately kitsch.\n\nThe illustration and animated gift frame one clear focal point. Before the reveal, the red action leads; afterward, the recipient's name takes center stage. The campaign editor carries the same palette and lettering into a calmer, more task-focused layout with restrained decoration.",
     "keyCharacteristics": [
-      "Saturated blue, candy red, golden yellow and ivory lettering.",
-      "Original cartoon Santa and reindeer, fairy lights and a separate animated gift.",
-      "Rounded display type paired with familiar body lettering.",
-      "Immediate reveal action, musical anticipation and a prominent recipient."
+      "Christmas-night blue, candy red, festive gold, and warm ivory.",
+      "Original picture-book Santa and reindeer art with a separate animated gift.",
+      "Rounded Fredoka display type paired with familiar sans-serif body lettering.",
+      "Tactile controls and an uncluttered campaign editor in the same visual world."
     ],
-    "rules": [],
+    "rules": [
+      {
+        "name": "The One Reveal Focus Rule",
+        "body": "Keep the festive scene around one clear focal point: the reveal action before the result, then the recipient's name.",
+        "section": "overview"
+      },
+      {
+        "name": "The Gift Palette Rule",
+        "body": "Let blue carry most of the surface; use red and gold as small, high-salience accents.",
+        "section": "colors"
+      },
+      {
+        "name": "The Name First Rule",
+        "body": "Keep the revealed recipient in the strongest type size and contrast on the result view.",
+        "section": "typography"
+      },
+      {
+        "name": "The Illustrated Depth Rule",
+        "body": "Use shadows to ground or lift an element; let artwork, outlines, and inset shading do the rest.",
+        "section": "elevation"
+      }
+    ],
     "dos": [
-      "Do preserve the saturated blue, candy red and golden Christmas game-stage world.",
-      "Do keep the golden recipient readable over the blue surface, including long names.",
-      "Do preserve keyboard focus, accessible control names and independent sound and motion choices.",
-      "Do keep Reveal immediately available and align gift anticipation with the shared 6.8-second drop.",
-      "Do keep all web interface copy in French and the browser title exactly `Secret Santa`."
+      "**Do** preserve the saturated blue stage, candy-red action, festive-gold accents, and warm ivory text.",
+      "**Do** keep the reveal action or recipient as the strongest focal point for its state.",
+      "**Do** preserve the original Christmas illustrations and the gift's layered, tactile construction.",
+      "**Do** keep gold keyboard focus visible and honor reduced-motion preferences.",
+      "**Do** keep the campaign editor calmer than the reveal page while retaining the same palette and type."
     ],
     "donts": [
-      "Don't expose the recipient before the reveal completes.",
-      "Don't require audio playback, a separate entrance click or animation to obtain the result.",
-      "Don't restore the rejected cream page backdrop.",
-      "Don't replace or modify the owner's audio and favicon as incidental design cleanup."
+      "**Don't** bring back the rejected cream page background.",
+      "**Don't** let decorative stars, gifts, or motion obscure the action, editor content, or recipient.",
+      "**Don't** clip long recipient names or narrow-screen form content.",
+      "**Don't** remove visible focus states or rely on color alone to indicate the active campaign."
     ]
   }
 }

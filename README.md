@@ -413,8 +413,9 @@ Export is local only, does not send mail and never prints private records to std
 
 `src/lib/` contains shared crypto, links and the public draw loader. `scripts/` separates
 participants, generation, archive validation, storage/checkpoints, command operations, MIME
-composition and Gmail SMTP transport. Root `index.html` is the Vite entry and is transformed
-during builds. `public/` contains files copied unchanged to the site, including `jingle_bell.mp3`.
+composition and Gmail SMTP transport. `src/` is the Vite root: `src/index.html` serves `/` and
+`src/config/index.html` serves `/config/`. `public/` contains files copied unchanged to the site,
+including `jingle_bell.mp3`.
 Add new public asset types explicitly to the build guard before publishing them.
 `AGENTS.md` documents code readability and the repository invariants.
 
