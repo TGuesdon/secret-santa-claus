@@ -58,24 +58,24 @@ it('reports denied audible autoplay and retries on one explicit activation', asy
   soundtrack.dispose();
 });
 
-it('waits for the actual musical drop and never reveals early', async () => {
+it('uses the jingle position to time the reveal', async () => {
   const soundtrack = new Soundtrack();
   const onDrop = vi.fn();
 
   soundtrack.enter();
   soundtrack.reveal(onDrop);
-  tracks[1].currentTime = 6.7;
+  tracks[1].currentTime = 6.45;
   await vi.advanceTimersByTimeAsync(500);
   expect(onDrop).not.toHaveBeenCalled();
 
-  tracks[1].currentTime = 6.8;
+  tracks[1].currentTime = 6.5;
   await vi.advanceTimersByTimeAsync(100);
   expect(onDrop).toHaveBeenCalledOnce();
   soundtrack.dispose();
   expect(vi.getTimerCount()).toBe(0);
 });
 
-it('reveals after 6.8 seconds when sound playback is unavailable', async () => {
+it('reveals after 6.5 seconds when sound playback is unavailable', async () => {
   const soundtrack = new Soundtrack();
   const onDrop = vi.fn();
 
@@ -83,10 +83,10 @@ it('reveals after 6.8 seconds when sound playback is unavailable', async () => {
     throw new Error('Playback blocked');
   });
   soundtrack.reveal(onDrop);
-  await vi.advanceTimersByTimeAsync(6700);
+  await vi.advanceTimersByTimeAsync(6450);
   expect(onDrop).not.toHaveBeenCalled();
 
-  await vi.advanceTimersByTimeAsync(100);
+  await vi.advanceTimersByTimeAsync(50);
   expect(onDrop).toHaveBeenCalledOnce();
   soundtrack.dispose();
 });

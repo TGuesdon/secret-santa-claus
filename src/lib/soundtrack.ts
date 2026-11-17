@@ -1,4 +1,4 @@
-export const DROP_SECONDS = 6.8;
+export const DROP_SECONDS = 6.5;
 const MUSIC_VOLUME = 0.55;
 const FADE_MILLISECONDS = 450;
 

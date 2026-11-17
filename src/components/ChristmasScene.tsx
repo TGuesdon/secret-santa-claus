@@ -1,14 +1,19 @@
 ﻿import type { CSSProperties, ReactNode } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import friends from '../assets/christmas-friends.webp';
 import friendsSmall from '../assets/christmas-friends-640.webp';
 import friendsMedium from '../assets/christmas-friends-1024.webp';
 import santa from '../assets/santa.webp';
 import santaSmall from '../assets/santa-256.webp';
+import { wording } from '../locales/fr';
 import { Icon } from './Icons';
 
 type SceneProps = {
+  arriving: boolean;
+  letterDelivered: boolean;
   opening: boolean;
   revealed: boolean;
+  onOpenLetter: () => void;
   children?: ReactNode;
 };
 
@@ -23,6 +28,13 @@ const starPositions = [
   { x: 89, y: 16, size: 30 },
   { x: 72, y: 73, size: 22 },
   { x: 91, y: 68, size: 16 },
+];
+
+const confettiBursts = [
+  { x: 50, y: 42, delay: 0, pieces: 30, firstAngle: 0, angleStep: 12, distance: 160 },
+  { x: 19, y: 76, delay: 280, pieces: 16, firstAngle: -66, angleStep: 5, distance: 118 },
+  { x: 81, y: 74, delay: 610, pieces: 16, firstAngle: -9, angleStep: 5, distance: 118 },
+  { x: 50, y: 32, delay: 1220, pieces: 44, firstAngle: 4, angleStep: 360 / 44, distance: 220 },
 ];
 
 export function Snow() {
@@ -45,7 +57,69 @@ export function Snow() {
   );
 }
 
-export function ChristmasScene({ opening, revealed, children }: SceneProps) {
+function SantaSleigh() {
+  const runwayRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const runway = runwayRef.current;
+
+    if (!runway) {
+      return;
+    }
+
+    const measureViewportOffset = () => {
+      const bottom = runway.getBoundingClientRect().bottom;
+
+      runway.style.setProperty('--sleigh-viewport-offset', `${bottom}px`);
+    };
+
+    // Start at the viewport corner and keep the delivery anchored to the scene.
+    measureViewportOffset();
+    window.addEventListener('resize', measureViewportOffset);
+
+    return () => window.removeEventListener('resize', measureViewportOffset);
+  }, []);
+
+  return (
+    <div className="sleigh-runway" ref={runwayRef} aria-hidden="true">
+      <div className="sleigh-flight">
+        <div className="sleigh">
+          <img
+            className="sleigh-santa"
+            src={santa}
+            srcSet={`${santaSmall} 256w, ${santa} 512w`}
+            sizes="(max-width: 700px) 125px, 235px"
+            alt=""
+            width="512"
+            height="512"
+          />
+          <span className="sleigh-mail" />
+          <span className="sleigh-runner" />
+          <span className="sleigh-body" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Envelope({ caption }: { caption?: string }) {
+  return (
+    <span className="envelope">
+      <span className="envelope-flap" />
+      <span className="envelope-seal" aria-hidden="true" />
+      {caption && <span className="envelope-caption">{caption}</span>}
+    </span>
+  );
+}
+
+export function ChristmasScene({
+  arriving,
+  letterDelivered,
+  opening,
+  revealed,
+  onOpenLetter,
+  children,
+}: SceneProps) {
   let stateClass = '';
 
   if (opening) {
@@ -69,16 +143,6 @@ export function ChristmasScene({ opening, revealed, children }: SceneProps) {
           fetchPriority="high"
         />
       </div>
-      <img
-        className="santa-illustration"
-        src={santa}
-        srcSet={`${santaSmall} 256w, ${santa} 512w`}
-        sizes="(max-width: 700px) 180px, 230px"
-        alt=""
-        width="512"
-        height="512"
-        aria-hidden="true"
-      />
       <div className="stage-stars" aria-hidden="true">
         {starPositions.map((star, index) => (
           <span
@@ -98,39 +162,56 @@ export function ChristmasScene({ opening, revealed, children }: SceneProps) {
           </span>
         ))}
       </div>
-      <div className="present" aria-hidden="true">
-        <div className="present-shadow" />
-        <div className="present-parcel">
-          <div className="present-body">
-            <span className="present-ribbon" />
+      {arriving && (
+        <>
+          <SantaSleigh />
+          <div className="letter-delivery letter-drop" aria-hidden="true">
+            <Envelope />
           </div>
-          <div className="present-lid">
-            <span className="bow bow-left" />
-            <span className="bow bow-right" />
-            <span className="bow-knot" />
-            <span className="lid-ribbon" />
-          </div>
-          <span className="gift-tag">Pour toi</span>
-        </div>
-      </div>
-      {revealed && (
-        <div className="confetti" aria-hidden="true">
-          {Array.from({ length: 30 }, (_, index) => (
-            <i
-              key={index}
-              style={
-                {
-                  '--angle': `${index * 12}deg`,
-                  '--travel': `${160 + (index % 5) * 33}px`,
-                  '--delay': `${(index % 4) * 0.035}s`,
-                  '--confetti-color': ['#b92f3b', '#e5ba69', '#346552', '#fff6df'][index % 4],
-                } as CSSProperties
-              }
-            />
-          ))}
+        </>
+      )}
+      {letterDelivered && (
+        <div className="letter-delivery">
+          {children}
+          {revealed ? (
+            <div className="opened-envelope" aria-hidden="true">
+              <Envelope />
+            </div>
+          ) : (
+            <button
+              className="letter-button"
+              type="button"
+              aria-disabled={opening}
+              onClick={onOpenLetter}
+            >
+              <Envelope caption={opening ? wording.opening.action : wording.ready.action} />
+            </button>
+          )}
         </div>
       )}
-      {children}
+      {revealed &&
+        confettiBursts.map((burst) => (
+          <div
+            key={burst.delay}
+            className="confetti"
+            aria-hidden="true"
+            style={{ '--burst-x': `${burst.x}%`, '--burst-y': `${burst.y}%` } as CSSProperties}
+          >
+            {Array.from({ length: burst.pieces }, (_, index) => (
+              <i
+                key={index}
+                style={
+                  {
+                    '--angle': `${burst.firstAngle + index * burst.angleStep}deg`,
+                    '--travel': `${burst.distance + (index % 5) * 33}px`,
+                    '--delay': `${burst.delay + (index % 4) * 35}ms`,
+                    '--confetti-color': ['#b92f3b', '#e5ba69', '#346552', '#fff6df'][index % 4],
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </div>
+        ))}
     </div>
   );
 }

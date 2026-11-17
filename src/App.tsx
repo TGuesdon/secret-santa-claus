@@ -1,10 +1,10 @@
 import { Brand } from './components/Brand';
-import { Button } from './components/Button';
 import { wording } from './locales/fr';
 import { DrawError } from './lib/draw-error';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ChristmasScene, Snow } from './components/ChristmasScene';
 import { FestiveBackdrop } from './components/FestiveBackdrop';
+import { StageCurtain } from './components/StageCurtain';
 import type { CSSProperties } from 'react';
 import { Icon } from './components/Icons';
 import { loadDraw, type Result } from './lib/draw-loader';
@@ -30,16 +30,19 @@ function subscribeToMotion(callback: () => void) {
 }
 
 type RevealState =
-  | { status: 'ready' | 'opening' }
+  | { status: 'closed' | 'arrival' | 'ready' | 'opening' }
   | { status: 'success'; result: Result }
   | { status: 'error'; message: string };
 
+const SLEIGH_FLIGHT_MILLISECONDS = 6400;
+
 function Experience({ fragment, search }: { fragment: string; search: string }) {
-  const [state, setState] = useState<RevealState>({ status: 'ready' });
+  const [state, setState] = useState<RevealState>({ status: 'closed' });
   const [muted, setMuted] = useState(false);
   const [soundBlocked, setSoundBlocked] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
   const soundtrack = useRef<Soundtrack | null>(null);
+  const stageHeading = useRef<HTMLHeadingElement>(null);
   const recipient = useRef<HTMLDivElement>(null);
   const active = useRef(true);
   const reducedMotion = useSyncExternalStore(
@@ -66,8 +69,11 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
   }
 
   const hasLink = Boolean(fragment) && !invalid;
+  const curtainClosed = hasLink && state.status === 'closed';
+  const arriving = state.status === 'arrival';
   const opening = state.status === 'opening';
   const revealed = state.status === 'success';
+  const letterDelivered = hasLink && !curtainClosed && !arriving;
   const animationsOff = reducedMotion || motionPaused;
   const soundLabel = soundBlocked ? wording.sound.enable : wording.sound.label;
   const soundState = muted ? wording.sound.muted : wording.sound.enabled;
@@ -78,16 +84,30 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
 
     soundtrack.current = music;
 
-    // A blocked intro must never hide the reveal button.
-    if (hasLink) {
-      music.enter();
-    }
-
     return () => {
       active.current = false;
       music.dispose();
     };
-  }, [hasLink]);
+  }, []);
+
+  useEffect(() => {
+    if (!arriving) {
+      return;
+    }
+
+    const arrival = window.setTimeout(
+      () => setState({ status: 'ready' }),
+      animationsOff ? 0 : SLEIGH_FLIGHT_MILLISECONDS,
+    );
+
+    return () => window.clearTimeout(arrival);
+  }, [arriving, animationsOff]);
+
+  useEffect(() => {
+    if (hasLink && !curtainClosed && !arriving && document.activeElement === document.body) {
+      stageHeading.current?.focus({ preventScroll: true });
+    }
+  }, [arriving, curtainClosed, hasLink]);
 
   useEffect(() => {
     if (state.status === 'success') {
@@ -100,20 +120,40 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
 
     setMuted(nextMuted);
     setSoundBlocked(false);
-    soundtrack.current?.setMuted(nextMuted);
+    if (hasLink && !curtainClosed) {
+      soundtrack.current?.setMuted(nextMuted);
+    }
+  }
+
+  function openCurtain() {
+    const music = soundtrack.current;
+
+    if (!curtainClosed || !music) {
+      return;
+    }
+
+    // Start audio directly from the click, before the curtain moves.
+    if (muted) {
+      music.setMuted(true);
+    }
+
+    music.enter();
+    setState({ status: animationsOff ? 'ready' : 'arrival' });
   }
 
   async function reveal() {
-    if (!soundtrack.current || opening) {
+    const music = soundtrack.current;
+
+    if (!music || (state.status !== 'ready' && state.status !== 'error')) {
       return;
     }
 
     setState({ status: 'opening' });
     setSoundBlocked(false);
 
-    // Decrypt during the build-up, but never mount the name before the drop.
+    // Decrypt during the build-up so the result is ready for the reveal cue.
     const musicalDrop = new Promise<void>((resolve) => {
-      soundtrack.current!.reveal(resolve);
+      music.reveal(resolve);
     });
 
     try {
@@ -139,41 +179,25 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
     }
   }
 
-  let heading = (
-    <>
-      {wording.ready.heading}
-      <br />
-      <em>{wording.ready.emphasis}</em>
-    </>
-  );
-  let description: string = wording.ready.description;
+  let headingCopy: { heading: string; emphasis: string } = hasLink ? wording.ready : wording.link;
 
   if (opening) {
-    heading = (
-      <>
-        {wording.opening.heading}
-        <br />
-        <em>{wording.opening.emphasis}</em>
-      </>
-    );
-    description = wording.opening.description;
+    headingCopy = wording.opening;
   }
 
   if (revealed) {
-    heading = (
-      <>
-        {wording.revealed.heading}
-        <br />
-        <em>{wording.revealed.emphasis}</em>
-      </>
-    );
-    description = wording.revealed.description(state.result.participantName);
+    headingCopy = wording.revealed;
   }
 
   return (
     <div
-      className={`christmas-app ${animationsOff ? 'motion-paused' : ''}`}
-      style={{ '--reveal-duration': `${DROP_SECONDS}s` } as CSSProperties}
+      className={`christmas-app ${animationsOff ? 'motion-paused' : ''} ${curtainClosed ? 'curtain-closed' : ''}`}
+      style={
+        {
+          '--reveal-duration': `${DROP_SECONDS}s`,
+          '--arrival-duration': `${SLEIGH_FLIGHT_MILLISECONDS}ms`,
+        } as CSSProperties
+      }
     >
       <div className="fairy-lights" aria-hidden="true">
         {Array.from({ length: 16 }, (_, index) => (
@@ -219,13 +243,27 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
         </div>
       </header>
 
-      <main className="experience">
-        <div className="heading-group">
-          <h2>{heading}</h2>
-          <p className="scene-description">{description}</p>
+      <main className="experience" inert={curtainClosed}>
+        <div className="heading-group" aria-hidden={curtainClosed || arriving || undefined}>
+          <h2
+            className={headingCopy === wording.ready ? 'invitation-heading' : undefined}
+            ref={stageHeading}
+            tabIndex={hasLink ? -1 : undefined}
+          >
+            {headingCopy.heading}
+            <br />
+            <em>{headingCopy.emphasis}</em>
+          </h2>
+          {opening && <p className="scene-description">{wording.opening.description}</p>}
         </div>
 
-        <ChristmasScene opening={opening} revealed={revealed}>
+        <ChristmasScene
+          arriving={arriving}
+          letterDelivered={letterDelivered}
+          opening={opening}
+          revealed={revealed}
+          onOpenLetter={reveal}
+        >
           {revealed && (
             <div className="recipient" role="status" ref={recipient} tabIndex={-1}>
               <span className="recipient-label">{wording.revealed.recipientLabel}</span>
@@ -248,15 +286,6 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
               )}
             </div>
           )}
-          {hasLink && !revealed && (
-            <>
-              <Button variant="primary" onClick={reveal} disabled={opening}>
-                {opening ? wording.opening.action : wording.ready.action}
-                {!opening && <Icon name="gift" />}
-              </Button>
-              <p className="action-note">{opening ? wording.opening.note : wording.ready.note}</p>
-            </>
-          )}
           {revealed && (
             <p className="success-note">
               <Icon name="star" /> {wording.revealed.note}
@@ -270,6 +299,8 @@ function Experience({ fragment, search }: { fragment: string; search: string }) 
           {soundBlocked && <p className="audio-message">{wording.sound.blocked}</p>}
         </div>
       </main>
+
+      {hasLink && <StageCurtain closed={curtainClosed} onOpen={openCurtain} />}
 
       <footer className="site-footer">
         <span>{wording.footer.credits}</span>

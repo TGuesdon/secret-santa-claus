@@ -33,6 +33,12 @@ async function mockDraw() {
   );
 }
 
+function openEnvelope() {
+  fireEvent.click(screen.getByRole('button', { name: 'Animations' }));
+  fireEvent.click(screen.getByRole('button', { name: /ouvrir le rideau/i }));
+  fireEvent.click(screen.getByRole('button', { name: /ouvrir la lettre/i }));
+}
+
 it('shows instructions without fetching data when no link is present', () => {
   vi.stubGlobal('fetch', () => {
     throw new Error('unexpected fetch');
@@ -47,20 +53,18 @@ it.each(fixtures)('reveals $name’s known fixture only after clicking', async (
   window.location.hash = `#v1.${p.id}.${p.key}`;
   vi.useFakeTimers();
   render(<App />);
-  expect(screen.queryByText(new RegExp(`Joyeux Noël ${p.name}`))).toBeNull();
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  expect(screen.queryByRole('status')).toBeNull();
+  openEnvelope();
   await act(() => vi.advanceTimersByTimeAsync(6900));
   vi.useRealTimers();
   expect((await screen.findByRole('status')).textContent).toContain(p.recipientName);
-  expect(screen.getByText(new RegExp(`Joyeux Noël ${p.name}`))).toBeDefined();
-  expect(screen.getByRole('status').textContent).toContain(p.recipientName);
 });
 
 it('shows errors without displaying raw decrypted data', async () => {
   await mockDraw();
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[1].key}`;
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   expect((await screen.findByRole('alert')).textContent).toMatch(/déchiffrer/);
 });
 
@@ -76,7 +80,7 @@ it('invalidates an in-flight reveal when the personal link changes', async () =>
   );
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   const encrypted = await encrypt(
     { participantName: 'Alice', recipientName: 'Bob' },
     fixtures[0].key,
@@ -85,20 +89,20 @@ it('invalidates an in-flight reveal when the personal link changes', async () =>
   window.location.hash = '';
   fireEvent(window, new HashChangeEvent('hashchange'));
   finish(new Response(JSON.stringify({ version: 1, entries: { [fixtures[0].id]: encrypted } })));
-  await waitFor(() => expect(screen.queryByText(/Joyeux Noël Alice/)).toBeNull());
-  expect(screen.getByText(/lien personnel/i)).toBeDefined();
+  await waitFor(() => expect(screen.getByText(/lien personnel/i)).toBeDefined());
+  expect(screen.queryByRole('status')).toBeNull();
 });
 
-it('keeps the recipient out of the DOM until the 6.8-second reveal', async () => {
+it('keeps the recipient out of the DOM until the reveal cue', async () => {
   await mockDraw();
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   vi.useFakeTimers();
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
-  await act(() => vi.advanceTimersByTimeAsync(6700));
+  openEnvelope();
+  await act(() => vi.advanceTimersByTimeAsync(6450));
   expect(screen.queryByText(fixtures[0].recipientName)).toBeNull();
 
-  await act(() => vi.advanceTimersByTimeAsync(200));
+  await act(() => vi.advanceTimersByTimeAsync(50));
   vi.useRealTimers();
   expect((await screen.findByRole('status')).textContent).toContain(fixtures[0].recipientName);
 });
@@ -120,7 +124,7 @@ it('waits for a slow result even after the musical drop', async () => {
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   vi.useFakeTimers();
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   await act(() => vi.advanceTimersByTimeAsync(6900));
   expect(screen.queryByText('Bob')).toBeNull();
   vi.useRealTimers();
@@ -135,7 +139,7 @@ it('reveals with sound disabled and transfers keyboard focus to the recipient', 
   vi.useFakeTimers();
   render(<App />);
   fireEvent.click(screen.getByRole('button', { name: 'Son' }));
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   await act(() => vi.advanceTimersByTimeAsync(6900));
   vi.useRealTimers();
   const result = await screen.findByRole('status');
@@ -162,7 +166,7 @@ it('preserves a long recipient name without truncation', async () => {
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   vi.useFakeTimers();
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   await act(() => vi.advanceTimersByTimeAsync(6900));
   vi.useRealTimers();
   expect((await screen.findByRole('status')).textContent).toContain(recipientName);
@@ -198,18 +202,28 @@ it('handles missing IDs, unsupported schemas, network errors and HTTP failures',
   ).rejects.toMatchObject({ code: 'load-failed' });
 });
 
-it('shows the French reveal immediately and recovers from blocked autoplay', async () => {
+it('starts the intro from the curtain gesture and delivers the letter even without audio', async () => {
   await mockDraw();
-  vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new Error('Autoplay blocked'));
-  window.location.hash = '#v1.' + fixtures[0].id + '.' + fixtures[0].key;
-  render(<App />);
-  expect(screen.getByRole('button', { name: /révéler mon tirage/i })).toBeDefined();
-  expect(screen.queryByRole('button', { name: /open|surprise/i })).toBeNull();
-  expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
-  const enableSound = await screen.findByRole('button', { name: 'Activer le son' });
+  const play = vi.mocked(HTMLMediaElement.prototype.play);
 
-  fireEvent.click(enableSound);
-  expect(screen.getByRole('button', { name: 'Son' })).toBeDefined();
+  play.mockRejectedValueOnce(new Error('Playback blocked'));
+  window.location.hash = '#v1.' + fixtures[0].id + '.' + fixtures[0].key;
+  vi.useFakeTimers();
+  render(<App />);
+  expect(play).not.toHaveBeenCalled();
+  expect(screen.queryByRole('heading', { name: /qui vas-tu gâter/i })).toBeNull();
+  expect(screen.queryByRole('button', { name: /ouvrir la lettre/i })).toBeNull();
+
+  fireEvent.click(screen.getByRole('button', { name: /ouvrir le rideau/i }));
+  expect(play).toHaveBeenCalledTimes(1);
+  expect(screen.queryByRole('heading', { name: /qui vas-tu gâter/i })).toBeNull();
+  expect(screen.queryByRole('button', { name: /ouvrir la lettre/i })).toBeNull();
+
+  await act(() => vi.advanceTimersByTimeAsync(6400));
+  expect(screen.getByRole('button', { name: 'Activer le son' })).toBeDefined();
+  expect(screen.getByRole('heading', { name: /qui vas-tu gâter/i })).toBeDefined();
+  expect(screen.getByRole('button', { name: /ouvrir la lettre/i })).toBeDefined();
+  expect(fetch).not.toHaveBeenCalled();
 });
 
 it('loads the campaign selected in the personal URL', async () => {
@@ -221,7 +235,7 @@ it('loads the campaign selected in the personal URL', async () => {
   );
   vi.useFakeTimers();
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
   await act(() => vi.advanceTimersByTimeAsync(6900));
   vi.useRealTimers();
 
@@ -240,7 +254,7 @@ it('rejects an invalid campaign query before fetching', () => {
   );
   render(<App />);
 
-  expect(screen.queryByRole('button', { name: /révéler/i })).toBeNull();
+  expect(screen.queryByRole('button', { name: /ouvrir le rideau/i })).toBeNull();
   expect(fetcher).not.toHaveBeenCalled();
 });
 
@@ -251,7 +265,7 @@ it.each([
   vi.stubGlobal('fetch', async () => new Response(body));
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
 
   expect((await screen.findByRole('alert')).textContent).toMatch(message);
 });
@@ -262,7 +276,7 @@ it('does not interpret diagnostic messages as domain error codes', async () => {
   });
   window.location.hash = `#v1.${fixtures[0].id}.${fixtures[0].key}`;
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: /révéler/i }));
+  openEnvelope();
 
   expect((await screen.findByRole('alert')).textContent).toMatch(/Vérifie ta connexion/);
 });

@@ -15,30 +15,30 @@ export const wording = {
     paused: 'en pause',
     enabled: 'activées',
   },
+  curtain: {
+    action: 'Ouvrir le rideau',
+  },
   ready: {
-    heading: 'Un cadeau.',
-    emphasis: 'Un joli secret.',
-    description: 'Ho ho ho… à qui vas-tu faire plaisir cette année ?',
-    action: 'Révéler mon tirage',
-    note: 'Un clic, des grelots, et le secret est à toi.',
+    heading: 'Le Père Noël t’a écrit.',
+    emphasis: 'Qui vas-tu gâter ?',
+    action: 'Ouvrir la lettre',
   },
   opening: {
     heading: 'Roulement',
     emphasis: 'de grelots…',
-    description: 'Les lutins s’agitent. Le suspense est à son comble !',
-    action: 'Les lutins déballent…',
-    note: 'Chut… la surprise arrive !',
+    description: 'Le cachet va bientôt céder…',
+    action: 'Ouverture de la lettre…',
   },
   revealed: {
     heading: 'Cette année,',
     emphasis: 'tu gâtes…',
-    description: (participantName: string) =>
-      `Joyeux Noël ${participantName} ! Voici ta mission secrète.`,
     recipientLabel: 'Ton cadeau est pour',
-    recipientNote: 'À toi de lui mettre des étoiles plein les yeux.',
+    recipientNote: 'À toi de lui mettre des étoiles plein les yeux !',
     note: 'Motus et boule de neige. Ça reste entre nous !',
   },
   link: {
+    heading: 'Ton tirage',
+    emphasis: 'de Noël.',
     invalidHeading: 'Oups, les lutins ont perdu un bout du lien.',
     invalidDescription:
       'Ce lien personnel est incomplet ou invalide. Demande le lien complet à l’organisateur.',

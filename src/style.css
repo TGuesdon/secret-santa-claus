@@ -71,7 +71,7 @@ html {
 /* Hanging bulbs frame the stage like a slightly overexcited Christmas party. */
 .fairy-lights {
   position: absolute;
-  z-index: 1;
+  z-index: 5;
   top: 0;
   left: -15px;
   right: -15px;
@@ -198,6 +198,7 @@ html {
 
 .experience {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -221,6 +222,9 @@ html {
   letter-spacing: -0.035em;
   text-wrap: balance;
   text-shadow: 0 4px 3px #102b60;
+}
+.heading-group .invitation-heading {
+  font-size: clamp(36px, 4.5vw, 64px);
 }
 .heading-group em {
   color: var(--gold);
@@ -253,135 +257,6 @@ html {
   width: 100%;
   height: auto;
 }
-.santa-illustration {
-  position: absolute;
-  width: 230px;
-  height: auto;
-  left: calc(50% - 115px);
-  bottom: 144px;
-  z-index: 1;
-  transform-origin: bottom center;
-  pointer-events: none;
-}
-.present {
-  position: absolute;
-  width: 228px;
-  height: 210px;
-  bottom: 25px;
-  left: calc(50% - 114px);
-  transform-origin: 50% 95%;
-  z-index: 2;
-}
-.present-shadow {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -9px;
-  height: 28px;
-  border-radius: 50%;
-  background: #48371c26;
-  filter: blur(10px);
-}
-.present-parcel {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 80%;
-}
-.present-body {
-  position: absolute;
-  inset: 60px 12px 0;
-  overflow: hidden;
-  border: 3px solid #85232d;
-  border-radius: 5px 5px 14px 14px;
-  background: #c94048;
-  box-shadow:
-    inset -16px 0 0 #aa2d38,
-    inset 0 -12px 0 #b32e38;
-}
-.present-ribbon {
-  position: absolute;
-  width: 40px;
-  height: 100%;
-  left: calc(50% - 20px);
-  background: #f4d18b;
-  border-inline: 3px solid #dcad5d;
-}
-.present-lid {
-  position: absolute;
-  top: 38px;
-  left: 0;
-  width: 100%;
-  height: 43px;
-  border: 3px solid #85232d;
-  border-radius: 7px;
-  background: #df5156;
-  box-shadow:
-    0 6px 8px #5a18292b,
-    inset 0 6px 0 #eb6c6c;
-  transform-origin: 40% center;
-}
-.lid-ribbon {
-  position: absolute;
-  inset: -3px auto -3px calc(50% - 23px);
-  width: 46px;
-  background: #f5d59a;
-  border: 3px solid #c99c50;
-}
-.bow {
-  position: absolute;
-  width: 73px;
-  height: 46px;
-  top: -44px;
-  border: 13px solid #f3d08e;
-  outline: 2px solid #bc8a42;
-  z-index: 2;
-  box-shadow: inset 0 2px 3px #95683136;
-}
-.bow-left {
-  left: 43px;
-  border-radius: 70% 60% 15% 60%;
-  transform: rotate(22deg);
-}
-.bow-right {
-  right: 43px;
-  border-radius: 60% 70% 60% 15%;
-  transform: rotate(-22deg);
-}
-.bow-knot {
-  position: absolute;
-  z-index: 3;
-  top: -15px;
-  left: calc(50% - 18px);
-  width: 36px;
-  height: 28px;
-  border: 2px solid #bd8b44;
-  border-radius: 9px;
-  background: #f9dfaa;
-}
-.gift-tag {
-  position: absolute;
-  top: 96px;
-  right: 15px;
-  padding: 7px 13px;
-  color: #753528;
-  border-radius: 3px;
-  background: #fff5d9;
-  font:
-    400 18px Fredoka,
-    sans-serif;
-  transform: rotate(13deg);
-  box-shadow: 0 2px 4px #74242a24;
-}
-.gift-tag::before {
-  content: '';
-  position: absolute;
-  width: 1px;
-  height: 34px;
-  background: #eacb91;
-  top: -32px;
-  left: 8px;
-  transform: rotate(-18deg);
-}
 .stage-stars {
   position: absolute;
   inset: 0;
@@ -403,7 +278,7 @@ html {
   position: relative;
   z-index: 3;
   margin-top: 16px;
-  min-height: 105px;
+  min-height: 65px;
   width: 100%;
 }
 .primary-button {
@@ -435,11 +310,6 @@ html {
 .primary-button:disabled {
   background: #8d3557;
   box-shadow: none;
-}
-.action-note {
-  margin: 13px 0 0;
-  font-size: 13px;
-  color: #d7e5ff;
 }
 .link-message {
   max-width: 470px;
@@ -477,60 +347,8 @@ html {
   font-size: 12px;
 }
 
-/* Reveal changes the scene, rather than hiding the result behind an animation. */
-.is-revealed .present {
-  transform: translateY(35px) scale(0.7);
-}
-.is-revealed .present-lid {
-  transform: translate(-70px, -160px) rotate(-28deg);
-  opacity: 0;
-}
-.is-revealed .gift-tag {
-  opacity: 0;
-}
-.is-revealed .santa-illustration {
-  visibility: hidden;
-}
 .is-revealed .scene-illustration {
   opacity: 0.75;
-}
-.recipient {
-  position: relative;
-  width: min(620px, 95%);
-  margin: 20px auto 0;
-  z-index: 4;
-  padding: 24px 15px 28px;
-  background: #173b78;
-  border-radius: 50%;
-  border: 2px solid var(--gold);
-}
-.christmas-scene.is-revealed {
-  height: auto;
-  min-height: 350px;
-  padding-bottom: 140px;
-}
-.recipient:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 6px;
-}
-.recipient-label {
-  display: block;
-  font-size: 15px;
-}
-.recipient strong {
-  display: block;
-  margin: 3px 0 8px;
-  color: var(--gold);
-  font:
-    600 clamp(40px, 6vw, 78px)/1.06 Fredoka,
-    sans-serif;
-  letter-spacing: -0.025em;
-  overflow-wrap: anywhere;
-}
-.recipient-note {
-  display: block;
-  font-size: 14px;
-  color: #e2ecff;
 }
 .success-note {
   display: flex;
@@ -549,7 +367,7 @@ html {
 }
 .confetti {
   position: absolute;
-  inset: 42% 50% auto;
+  inset: var(--burst-y) auto auto var(--burst-x);
   z-index: 5;
   pointer-events: none;
 }
@@ -580,10 +398,7 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .christmas-app:not(.motion-paused) {
-    .santa-illustration {
-      animation: santa-wave 2.5s ease-in-out infinite alternate;
-    }
+  .christmas-app:not(.motion-paused, .curtain-closed) {
     .fairy-lights span {
       animation: bulb-swing 3s ease-in-out infinite alternate;
     }
@@ -593,44 +408,18 @@ html {
     .scene-illustration {
       animation: scene-sway 4s ease-in-out infinite alternate;
     }
-    .present {
-      animation: gift-bob 3s ease-in-out infinite;
-    }
     .star {
       animation: star-sway 3s ease-in-out var(--star-delay) infinite alternate;
     }
     .snow span {
       animation: snowfall var(--duration) linear var(--delay) infinite;
     }
-    .is-opening .present {
-      animation: gift-growth var(--reveal-duration) ease-in-out both;
-    }
-    .is-opening .present-parcel {
-      animation: gift-rattle var(--reveal-duration) linear both;
-    }
     .is-opening .star {
       animation: star-orbit 2s ease-in-out infinite alternate;
-    }
-    .is-revealed .present {
-      animation: gift-settle 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-    .is-revealed .present-lid {
-      animation: lid-launch 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-    .recipient {
-      animation: recipient-arrive 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     .confetti i {
       animation: confetti-burst 1.8s cubic-bezier(0.12, 0.7, 0.2, 1) var(--delay) both;
     }
-  }
-}
-@keyframes santa-wave {
-  from {
-    transform: rotate(-6deg);
-  }
-  to {
-    transform: rotate(5deg) translateY(-7px);
   }
 }
 @keyframes bulb-swing {
@@ -647,15 +436,6 @@ html {
     transform: rotate(0.6deg) translateY(-4px);
   }
 }
-@keyframes gift-bob {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-  50% {
-    transform: translateY(-11px) rotate(2deg);
-  }
-}
 @keyframes star-sway {
   to {
     transform: translateY(-9px) rotate(12deg);
@@ -669,108 +449,6 @@ html {
 @keyframes star-orbit {
   to {
     transform: translateY(-45px) rotate(100deg) scale(1.4);
-  }
-}
-@keyframes gift-growth {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  30% {
-    transform: translateY(-8px) scale(1.07);
-  }
-  60% {
-    transform: translateY(-15px) scale(1.2);
-  }
-  80% {
-    transform: translateY(-24px) scale(1.38);
-  }
-  100% {
-    transform: translateY(-34px) scale(1.55);
-  }
-}
-@keyframes gift-rattle {
-  0%,
-  100% {
-    transform: translateX(0) rotate(0);
-  }
-  10% {
-    transform: translateX(-2px) rotate(-2deg);
-  }
-  20% {
-    transform: translateX(2px) rotate(2deg);
-  }
-  30% {
-    transform: translateX(-3px) rotate(-3deg);
-  }
-  40% {
-    transform: translateX(3px) rotate(3deg);
-  }
-  48% {
-    transform: translateX(-5px) rotate(-5deg);
-  }
-  56% {
-    transform: translateX(5px) rotate(5deg);
-  }
-  64% {
-    transform: translateX(-8px) rotate(-8deg);
-  }
-  69% {
-    transform: translateX(8px) rotate(8deg);
-  }
-  74% {
-    transform: translateX(-10px) rotate(-10deg);
-  }
-  78% {
-    transform: translateX(10px) rotate(10deg);
-  }
-  82% {
-    transform: translateX(-12px) rotate(-12deg);
-  }
-  86% {
-    transform: translateX(12px) rotate(12deg);
-  }
-  89% {
-    transform: translateX(-13px) rotate(-13deg);
-  }
-  92% {
-    transform: translateX(13px) rotate(13deg);
-  }
-  94% {
-    transform: translateX(-14px) rotate(-14deg);
-  }
-  96% {
-    transform: translateX(14px) rotate(14deg);
-  }
-  98% {
-    transform: translateX(-15px) rotate(-15deg);
-  }
-}
-@keyframes gift-settle {
-  from {
-    transform: translateY(-34px) scale(1.55);
-  }
-  to {
-    transform: translateY(35px) scale(0.7);
-  }
-}
-@keyframes lid-launch {
-  from {
-    transform: none;
-    opacity: 1;
-  }
-  to {
-    transform: translate(-70px, -160px) rotate(-28deg);
-    opacity: 0;
-  }
-}
-@keyframes recipient-arrive {
-  from {
-    opacity: 0;
-    transform: translateY(36px) scale(0.85);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 @keyframes confetti-burst {
@@ -829,6 +507,9 @@ html {
   .heading-group h2 {
     font-size: clamp(38px, 8.8vw, 58px);
   }
+  .heading-group .invitation-heading {
+    font-size: clamp(26px, 8.2vw, 48px);
+  }
   .scene-description {
     margin-top: 15px;
     font-size: 14px;
@@ -845,18 +526,9 @@ html {
     left: -6%;
     bottom: 0;
   }
-  .present {
-    scale: 0.82;
-    bottom: 3px;
-  }
-  .santa-illustration {
-    width: 180px;
-    left: calc(50% - 90px);
-    bottom: 130px;
-  }
   .action-area {
     margin-top: 10px;
-    min-height: 100px;
+    min-height: 56px;
   }
   .primary-button {
     width: min(100%, 310px);
@@ -871,24 +543,6 @@ html {
   }
   .site-footer span:last-child {
     display: none;
-  }
-  .recipient {
-    margin-top: 7px;
-    width: 94%;
-    padding: 20px 13px 24px;
-  }
-  .christmas-scene.is-revealed {
-    min-height: 300px;
-    padding-bottom: 140px;
-  }
-  .recipient strong {
-    font-size: clamp(36px, 10vw, 58px);
-  }
-  .recipient-note {
-    font-size: 12px;
-  }
-  .recipient-label {
-    font-size: 13px;
   }
   .success-note {
     font-size: 13px;
@@ -914,8 +568,5 @@ html {
   .primary-button,
   .quiet-button {
     border: 1px solid ButtonText;
-  }
-  .recipient {
-    border: 1px solid CanvasText;
   }
 }
