@@ -38,7 +38,7 @@ it('requests audible intro autoplay instead of starting silently and raising the
   soundtrack.dispose();
 });
 
-it('plays the decoded intro as one continuous loop and suspends it for the jingle', async () => {
+it.each([true, false])('loops the intro (Audio Session %s)', async (hasAudioSession) => {
   const buffer = {} as AudioBuffer;
   const source = { buffer: null, loop: false, connect: vi.fn(), start: vi.fn() };
   const gain = { gain: { value: 0 }, connect: vi.fn() };
@@ -51,8 +51,13 @@ it('plays the decoded intro as one continuous loop and suspends it for the jingl
     createBufferSource: vi.fn(() => source),
   };
   const fetchIntro = vi.fn(async () => new Response(new Uint8Array([1, 2, 3])));
+  const audioSession = hasAudioSession ? { type: 'auto' } : undefined;
+  let sessionTypeAtCreation: string | undefined;
 
+  vi.stubGlobal('navigator', audioSession ? { audioSession } : {});
   vi.stubGlobal('AudioContext', function () {
+    sessionTypeAtCreation = audioSession?.type;
+
     return context;
   });
   vi.stubGlobal('fetch', fetchIntro);
@@ -60,6 +65,7 @@ it('plays the decoded intro as one continuous loop and suspends it for the jingl
 
   expect(fetchIntro).not.toHaveBeenCalled();
   soundtrack.enter();
+  expect(sessionTypeAtCreation).toBe(hasAudioSession ? 'playback' : undefined);
   expect(context.resume).toHaveBeenCalledOnce();
   await vi.advanceTimersByTimeAsync(0);
 

@@ -35,7 +35,7 @@ export class IntroLoop {
     const request = ++this.playRequest;
 
     try {
-      const context = (this.context ??= new AudioContext());
+      const context = (this.context ??= this.createContext());
 
       // Unlock audio during the curtain click, before loading the file.
       const resumed = context.resume();
@@ -90,6 +90,17 @@ export class IntroLoop {
     this.cancelPendingPlay();
     this.media.pause();
     this.closeContext();
+  }
+
+  private createContext() {
+    const { audioSession } = navigator as Navigator & { audioSession?: { type: string } };
+
+    if (audioSession) {
+      // Use media playback routing so iOS can play the intro in silent mode.
+      audioSession.type = 'playback';
+    }
+
+    return new AudioContext();
   }
 
   private async decode(context: AudioContext) {
